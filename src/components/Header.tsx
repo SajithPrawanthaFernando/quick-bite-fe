@@ -5,10 +5,16 @@ import React, { useEffect, useState } from "react";
 import { logo } from "../../public/images";
 import { Menu, ShoppingCart, Search, MapPin, ChevronDown } from "lucide-react";
 import { MenuDrawer } from "./MenuDrawer";
+import { LoginModal } from "./modals/LoginModal";
+import { SignupModal } from "./modals/SignupModal";
 
 export const Header = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+
+  const isModalOpen = isLoginOpen || isSignupOpen;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,14 +32,20 @@ export const Header = () => {
 
   return (
     <nav
-      className={`fixed top-0 w-full z-[50] flex items-center justify-between px-10 py-4 transition-all duration-300 ${
+      className={`fixed top-0 w-full z-1 flex items-center justify-between pl-10 pr-12 py-4 transition-all duration-300 ${
         isVisible ? "bg-white opacity-100" : "opacity-0 -translate-y-full"
-      }`}
+      }     ${isModalOpen ? "bg-mainBlack/20 backdrop-blur-sm" : ""}`}
     >
+      {isModalOpen && (
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-md pointer-events-none z-[-1]" />
+      )}
       {/* Left Section */}
       <div className="flex items-center gap-4">
         <MenuDrawer />
-        <Image src={logo} alt="QuickBite" className="w-[120px] h-auto" />
+        <Link href="/">
+          <Image src={logo} alt="QuickBite" className="w-[120px] h-auto" />
+        </Link>
+
         <div className="flex items-center bg-gray-100 rounded-full p-1">
           <button className="px-4 py-1 rounded-full bg-white text-[15px] font-medium text-black">
             Delivery
@@ -69,18 +81,24 @@ export const Header = () => {
             0
           </span>
         </div>
-        <Link
-          href="/login"
-          className="text-[15px] font-medium mr-[-10px] text-black hover:underline"
-        >
-          Log in
-        </Link>
-        <Link
-          href="/signup"
-          className="text-[15px] font-medium text-black bg-gray-100 px-4 py-2 rounded-full hover:bg-gray-200 transition-all duration-300"
-        >
-          Sign up
-        </Link>
+        <LoginModal
+          open={isLoginOpen}
+          onOpenChange={setIsLoginOpen}
+          trigger={
+            <button className="text-[15px] font-medium mr-[-10px] text-black hover:underline">
+              Log in
+            </button>
+          }
+        />
+        <SignupModal
+          open={isSignupOpen}
+          onOpenChange={setIsSignupOpen}
+          trigger={
+            <button className="text-[15px] font-medium text-black bg-gray-100 px-4 py-2 rounded-full hover:bg-gray-200 transition-all duration-300">
+              Sign up
+            </button>
+          }
+        />
       </div>
     </nav>
   );

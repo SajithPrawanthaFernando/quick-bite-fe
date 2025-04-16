@@ -13,7 +13,7 @@ export const MenuDrawer = () => {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button className="p-2">
+        <button className="pl-2 py-2">
           <Menu strokeWidth={2} className="text-black w-6 h-6" />
         </button>
       </Dialog.Trigger>
@@ -39,7 +39,7 @@ export const MenuDrawer = () => {
             <div className="flex flex-col gap-2">
               <Link
                 href="/signup"
-                className="bg-black hover:bg-black/80 text-white text-center py-4 rounded-md font-medium transition-all duration-300"
+                className="bg-black hover:bg-[#FDB940] text-white hover:text-black  text-center py-4 rounded-md font-medium transition-all duration-300"
               >
                 Sign up
               </Link>
@@ -53,12 +53,22 @@ export const MenuDrawer = () => {
 
             {/* Links */}
             <div className="mt-8 flex flex-col gap-5 text-sm font-medium text-black">
-              <Link href="#">Create a business account</Link>
-              <Link href="#">Add your restaurant</Link>
-              <Link href="#">Sign up to deliver</Link>
-              <Link href="#" className="flex items-center gap-1">
-                Get a ride <ExternalLink className="ml-[2px] w-4 h-4" />
-              </Link>
+              <Dialog.Close asChild>
+                <Link href="#">Create a business account</Link>
+              </Dialog.Close>
+              <Dialog.Close asChild>
+                <Link href="/RestaurantOwnerRegisterPage">
+                  Add your restaurant
+                </Link>
+              </Dialog.Close>
+              <Dialog.Close asChild>
+                <Link href="/DeliveryRiderPage">Sign up to deliver</Link>
+              </Dialog.Close>
+              <Dialog.Close asChild>
+                <Link href="#" className="flex items-center gap-1">
+                  Get a ride <ExternalLink className="ml-[2px] w-4 h-4" />
+                </Link>
+              </Dialog.Close>
             </div>
           </div>
 
