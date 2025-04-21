@@ -6,3 +6,4 @@ export * from "./WhyQuickBiteSection";
 export * from "./DeliverWithQuickBite";
 export * from "./MakeMoneySection";
 export * from "./HowItWorksSteps";
+export * from "./DashboardLayout";

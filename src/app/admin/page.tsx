@@ -1,0 +1,154 @@
+"use client";
+
+export default function OverviewPage() {
+  const cards = [
+    {
+      label: "Total Users",
+      value: "12,345",
+      growth: "+12%",
+      bgColor: "bg-[#FDB940]",
+      icon: "👤",
+    },
+    {
+      label: "Total Orders",
+      value: "48,210",
+      growth: "+22%",
+      bgColor: "bg-[#1E2A52]",
+      icon: "🛒",
+    },
+    {
+      label: "Pending Orders",
+      value: "2,145",
+      growth: "-8%",
+      bgColor: "bg-[#E2E8F0]",
+      icon: "⏳",
+    },
+    {
+      label: "Completed Orders",
+      value: "45,789",
+      growth: "+18%",
+      bgColor: "bg-[#38A169]",
+      icon: "✅",
+    },
+    {
+      label: "Total Revenue",
+      value: "$1,254,000",
+      growth: "+30%",
+      bgColor: "bg-[#3182CE]",
+      icon: "💰",
+    },
+    {
+      label: "Refunds Issued",
+      value: "$12,400",
+      growth: "-5%",
+      bgColor: "bg-[#E53E3E]",
+      icon: "🔄",
+    },
+  ];
+
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-2 text-black">Welcome, Admin</h1>
+      <p className="text-gray-500 mb-6">
+        You have <span className="text-orange-500 font-medium">200+</span>{" "}
+        orders today.
+      </p>
+
+      {/* Owner Requests Alert */}
+      <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-2 rounded mb-6">
+        You have <span className="font-semibold">12 owner requests</span>{" "}
+        pending approval.{" "}
+        <span className="text-blue-500 underline cursor-pointer">
+          Accept Now
+        </span>
+      </div>
+
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        {cards.map((card, index) => (
+          <div
+            key={index}
+            className={`rounded-lg text-white shadow-md ${card.bgColor} p-4`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-2xl">{card.icon}</span>
+              <span className="text-sm bg-white text-black rounded px-2">
+                {card.growth}
+              </span>
+            </div>
+            <div className="text-lg font-semibold">{card.label}</div>
+            <div className="text-2xl font-bold">{card.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Section Placeholder */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Top Customers */}
+        <div className="bg-white p-4 shadow rounded-lg">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-lg">Top Customers</h2>
+            <button className="text-blue-600 text-sm underline">
+              View All
+            </button>
+          </div>
+          <ul className="space-y-3">
+            {[
+              {
+                name: "Carlos Curran",
+                country: "USA",
+                orders: 24,
+                amount: "$8,964",
+              },
+              {
+                name: "Stan Gaunter",
+                country: "UAE",
+                orders: 22,
+                amount: "$16,985",
+              },
+              {
+                name: "Richard Wilson",
+                country: "Germany",
+                orders: 14,
+                amount: "$5,366",
+              },
+            ].map((customer, i) => (
+              <li key={i} className="flex justify-between items-center text-sm">
+                <div>
+                  <div className="font-semibold">{customer.name}</div>
+                  <div className="text-gray-500 text-xs">
+                    {customer.country} • {customer.orders} Orders
+                  </div>
+                </div>
+                <div className="font-bold">{customer.amount}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* Pie Chart Placeholder */}
+        <div className="bg-white p-4 shadow rounded-lg flex flex-col items-center justify-center">
+          <h2 className="font-semibold text-lg mb-2">Top Categories</h2>
+          <div className="w-[140px] h-[140px] bg-gray-100 rounded-full flex items-center justify-center text-gray-400">
+            Pie Chart
+          </div>
+        </div>
+
+        {/* Order Heatmap Placeholder */}
+        <div className="bg-white p-4 shadow rounded-lg">
+          <h2 className="font-semibold text-lg mb-4">Order Statistics</h2>
+          <div className="grid grid-cols-7 gap-1">
+            {[...Array(49)].map((_, i) => (
+              <div
+                key={i}
+                className={`h-6 w-6 rounded ${
+                  i % 7 === 0 ? "bg-orange-400" : "bg-orange-100"
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

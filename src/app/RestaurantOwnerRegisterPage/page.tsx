@@ -6,6 +6,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useRef, useEffect } from "react";
 import { HowItWorksSection, WhyQuickBiteSection } from "@/components";
+import { AppDispatch } from "@/hooks/reduxHooks";
+import { useToast } from "@/components/ToastProvider";
+import { signupUser } from "@/redux/actions/authActions";
 
 // Validation schema
 const schema = yup.object().shape({
@@ -13,6 +16,10 @@ const schema = yup.object().shape({
   lastName: yup.string().required("Last name is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   phone: yup.string().required("Phone number is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
 });
 
 export default function RestaurantOwnerRegisterPage() {
@@ -20,19 +27,40 @@ export default function RestaurantOwnerRegisterPage() {
     register,
     handleSubmit,
     setFocus,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
 
-  const firstNameRef = useRef<HTMLInputElement>(null);
-
   useEffect(() => {
     setFocus("firstName");
   }, [setFocus]);
 
-  const onSubmit = (data: any) => {
-    console.log("Owner Registration:", data);
+  const dispatch = AppDispatch();
+  const { showToast } = useToast();
+
+  const onSubmit = async (data: any) => {
+    const payload = {
+      email: data.email,
+      phone: data.phone,
+      firstname: data.firstName,
+      lastname: data.lastName,
+      fullname: `${data.firstName} ${data.lastName}`,
+      roles: ["restaurantOwner"],
+      password: data.password,
+    };
+
+    try {
+      await dispatch(signupUser(payload));
+      showToast(
+        "Registration successful",
+        "Our team will get in touch with you."
+      );
+      reset();
+    } catch (error) {
+      showToast("Registration failed", "Please try again later.", "error");
+    }
   };
 
   return (
@@ -148,6 +176,29 @@ export default function RestaurantOwnerRegisterPage() {
               {errors.phone && (
                 <p className="text-red-500 text-xs mt-1">
                   {errors.phone.message}
+                </p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <Label.Root
+                className="text-[15px] font-medium text-gray-700"
+                htmlFor="password"
+              >
+                Password
+              </Label.Root>
+              <input
+                type="password"
+                {...register("password")}
+                id="password"
+                className={`mt-1 w-full border px-3 py-2 rounded-md text-black focus:outline-none focus:ring focus:ring-[#FDB940] ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.password.message}
                 </p>
               )}
             </div>

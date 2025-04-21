@@ -1,8 +1,7 @@
-import type { Metadata } from "next";
 import { Lexend } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components";
-import { Footer } from "@/components";
+import { ReduxProvider } from "@/redux/provider";
+import { ProvidersWrapper } from "@/components/ProvidersWrapper";
 
 const lexend = Lexend({
   variable: "--font-lexend",
@@ -10,28 +9,15 @@ const lexend = Lexend({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "QuickBite",
-  description: "Your fast and delicious food delivery app",
-};
-
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body
-        className={`
-          ${lexend.variable} 
-        
-          antialiased
-        `}
-      >
-        <Header />
-        {children}
-        <Footer />
+      <body className={`${lexend.variable} antialiased`}>
+        <ReduxProvider>
+          <ProvidersWrapper>{children}</ProvidersWrapper>
+        </ReduxProvider>
       </body>
     </html>
   );

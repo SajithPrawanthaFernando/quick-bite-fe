@@ -5,3 +5,4 @@ export { default as googleplay } from "./googleplay.png";
 export { default as applestore } from "./applestore.svg";
 export { default as restaurantowner } from "./restaurantowner.png";
 export { default as deliveryguy } from "./deliveryguy.jpg";
+export { default as user1 } from "./user.jpg";

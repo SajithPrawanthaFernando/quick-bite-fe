@@ -7,6 +7,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import * as yup from "yup";
 import { useEffect } from "react";
+import { signupUser } from "@/redux/actions/authActions";
+import { AppDispatch } from "@/hooks/reduxHooks";
+import { useToast } from "../ToastProvider";
 
 // Updated Validation Schema
 const schema = yup.object().shape({
@@ -37,10 +40,26 @@ export const DeliveryRiderRegisterModal = ({
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data: any) => {
-    console.log("Rider Registration:", data);
-    onOpenChange(false);
-    reset(); // reset form after submission
+  const dispatch = AppDispatch();
+  const { showToast } = useToast();
+
+  const onSubmit = async (data: any) => {
+    const payload = {
+      email: data.email,
+      phone: data.phone,
+      password: data.password,
+      fullname: data.fullName,
+      roles: ["driver"],
+    };
+
+    try {
+      await dispatch(signupUser(payload));
+      showToast("Registration Successful", "Welcome to the QuickBite team!");
+      onOpenChange(false);
+      reset();
+    } catch (error) {
+      showToast("Registration Failed", "Please try again later.", "error");
+    }
   };
 
   useEffect(() => {

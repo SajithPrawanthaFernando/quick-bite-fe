@@ -7,6 +7,9 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useEffect, useState } from "react";
+import { AppDispatch } from "@/hooks/reduxHooks";
+import { loginUser } from "@/redux/actions/authActions";
+import { useToast } from "../ToastProvider";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -40,8 +43,21 @@ export const LoginModal = ({
     }
   }, [open, reset]);
 
-  const onSubmit = (data: any) => {
-    console.log("Login Data:", data);
+  const dispatch = AppDispatch();
+  const { showToast } = useToast();
+
+  const onSubmit = async (data: any) => {
+    try {
+      const res = await dispatch(loginUser(data.email, data.password));
+      showToast("Success", "Login successful!");
+      onOpenChange(false);
+    } catch (error) {
+      showToast(
+        "Failed",
+        "Login failed. Please check your credentials.",
+        "error"
+      );
+    }
   };
 
   return (

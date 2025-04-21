@@ -6,6 +6,9 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useEffect } from "react";
+import { signupUser } from "@/redux/actions/authActions";
+import { useToast } from "../ToastProvider";
+import { AppDispatch } from "@/hooks/reduxHooks";
 
 const schema = yup.object().shape({
   name: yup.string().required("Full name is required"),
@@ -14,6 +17,13 @@ const schema = yup.object().shape({
     .string()
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
+  phone: yup
+    .string()
+    .matches(
+      /^94\d{9}$/,
+      "Phone must be a valid Sri Lankan number starting with 94"
+    )
+    .required("Phone number is required"),
 });
 
 export const SignupModal = ({
@@ -40,8 +50,25 @@ export const SignupModal = ({
     }
   }, [open, reset]);
 
-  const onSubmit = (data: any) => {
-    console.log("Signup Data:", data);
+  const dispatch = AppDispatch();
+  const { showToast } = useToast();
+
+  const onSubmit = async (data: any) => {
+    const payload = {
+      email: data.email,
+      password: data.password,
+      fullname: data.name,
+      phone: data.phone,
+      roles: ["user"],
+    };
+
+    try {
+      await dispatch(signupUser(payload));
+      showToast("Signup Successful", "You can now log in.");
+      onOpenChange(false);
+    } catch (err) {
+      showToast("Signup Failed", "Something went wrong.", "error");
+    }
   };
 
   return (
@@ -109,6 +136,28 @@ export const SignupModal = ({
               {errors.email && (
                 <span className="text-red-500 text-xs mt-1">
                   {errors.email.message}
+                </span>
+              )}
+            </div>
+
+            {/* Phone Number */}
+            <div className="flex flex-col">
+              <label
+                htmlFor="phone"
+                className="text-sm font-medium text-gray-700"
+              >
+                Phone Number
+              </label>
+              <input
+                id="phone"
+                {...register("phone")}
+                className={`mt-1 border rounded-md text-black px-3 py-2 focus:outline-none focus:ring focus:ring-[#FDB940] ${
+                  errors.phone ? "border-red-500" : "border-gray-300"
+                }`}
+              />
+              {errors.phone && (
+                <span className="text-red-500 text-xs mt-1">
+                  {errors.phone.message}
                 </span>
               )}
             </div>
