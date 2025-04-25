@@ -5,9 +5,11 @@ import Link from "next/link";
 import { deliveryguy } from "../../public/images";
 import { useState } from "react";
 import { DeliveryRiderRegisterModal } from "./modals/DeliveryRiderRegisterModal";
+import { LoginModal } from "./modals/LoginModal";
 
 export const DeliverWithQuickBite = () => {
   const [isRiderModalOpen, setIsRiderModalOpen] = useState(false);
+  const [isLoginOpen, setLoginOpen] = useState(false);
 
   return (
     <section className="flex flex-col md:flex-row bg-black text-white min-h-[500px] pt-[130px] pb-[70px]  px-40">
@@ -31,12 +33,12 @@ export const DeliverWithQuickBite = () => {
           >
             Sign up to deliver
           </button>
-          <Link
-            href="/login"
+          <button
+            onClick={() => setLoginOpen(true)}
             className="text-sm text-white underline underline-offset-4 hover:text-[#FDB940] transition-all"
           >
             Already have an account? Sign in
-          </Link>
+          </button>
         </div>
       </div>
 
@@ -54,6 +56,8 @@ export const DeliverWithQuickBite = () => {
         open={isRiderModalOpen}
         onOpenChange={setIsRiderModalOpen}
       />
+
+      <LoginModal open={isLoginOpen} onOpenChange={setLoginOpen} />
     </section>
   );
 };

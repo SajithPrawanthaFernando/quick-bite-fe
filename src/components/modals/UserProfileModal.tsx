@@ -31,7 +31,13 @@ export const UserProfileModal = ({
   const schema = yup.object().shape({
     fullname: yup.string().required("Full name is required"),
     email: yup.string().email("Invalid email").required("Email is required"),
-    phone: yup.string().required("Phone number is required"),
+    phone: yup
+      .string()
+      .required("Phone number is required")
+      .matches(
+        /^94\d{9}$/,
+        "Phone number must start with 94 and contain 11 digits"
+      ),
   });
 
   const {
@@ -67,6 +73,7 @@ export const UserProfileModal = ({
 
   const handleLogout = async () => {
     await dispatch(logoutUser());
+    onOpenChange(false);
     showToast("Logged out", "You have been successfully logged out.");
   };
 

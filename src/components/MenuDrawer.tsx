@@ -8,8 +8,31 @@ import Image from "next/image";
 import Link from "next/link";
 import { logo2, logo3 } from "../../public/images";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { useState } from "react";
+import * as Avatar from "@radix-ui/react-avatar";
+import { UserProfileModal } from "./modals/UserProfileModal";
 
-export const MenuDrawer = () => {
+export const MenuDrawer = ({
+  onLogin,
+  onSignup,
+}: {
+  onLogin: () => void;
+  onSignup: () => void;
+}) => {
+  const user1 = useSelector((state: RootState) => state.auth.isAuthenticated);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isSignupOpen, setIsSignupOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+
+  const user = {
+    name: "Sajith Fernando",
+    email: "sajith@example.com",
+    role: "Rider",
+    avatarUrl: "/images/user.jpg",
+  };
+
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
@@ -36,20 +59,52 @@ export const MenuDrawer = () => {
             </div>
 
             {/* Primary Actions */}
-            <div className="flex flex-col gap-2">
-              <Link
-                href="/signup"
-                className="bg-black hover:bg-[#FDB940] text-white hover:text-black  text-center py-4 rounded-md font-medium transition-all duration-300"
-              >
-                Sign up
-              </Link>
-              <Link
-                href="/login"
-                className=" bg-gray-100 hover:bg-gray-200 text-center transition-all duration-300 py-4 rounded-md font-medium text-black "
-              >
-                Log in
-              </Link>
-            </div>
+            {user1 ? (
+              <>
+                <button
+                  onClick={() => setIsProfileOpen(true)}
+                  className="focus:outline-none"
+                >
+                  <Avatar.Root className="flex flex-row h-25 w-25 ml-[90px] items-center justify-center rounded-full bg-gray-100 overflow-hidden">
+                    <Avatar.Image
+                      src={user.avatarUrl}
+                      alt={user.name}
+                      className="h-full w-full object-cover"
+                    />
+                    <Avatar.Fallback className="text-sm font-medium text-black">
+                      {user.name
+                        .split(" ")
+                        .map((n) => n[0])
+                        .join("")}
+                    </Avatar.Fallback>
+                  </Avatar.Root>
+                </button>
+
+                <UserProfileModal
+                  open={isProfileOpen}
+                  onOpenChange={setIsProfileOpen}
+                />
+              </>
+            ) : (
+              <div className="flex flex-col gap-2">
+                <button
+                  onClick={() => {
+                    onSignup();
+                  }}
+                  className="bg-black hover:bg-[#FDB940] text-white hover:text-black  text-center py-4 rounded-md font-medium transition-all duration-300"
+                >
+                  Sign up
+                </button>
+                <button
+                  onClick={() => {
+                    onLogin();
+                  }}
+                  className=" bg-gray-100 hover:bg-gray-200 text-center transition-all duration-300 py-4 rounded-md font-medium text-black "
+                >
+                  Log in
+                </button>
+              </div>
+            )}
 
             {/* Links */}
             <div className="mt-8 flex flex-col gap-5 text-sm font-medium text-black">

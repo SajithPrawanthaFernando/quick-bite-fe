@@ -18,13 +18,14 @@ export const loginUser =
     try {
       const response = await authApi.post(USER_LOGIN, { email, password });
       const { token, user } = response.data;
-
       dispatch(loginSuccess({ token, user }));
 
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+      return user;
     } catch (error: any) {
       dispatch(loginFailure(error?.response?.data?.message || "Login failed"));
+      throw new Error(error?.response?.data?.message || "Login failed");
     }
   };
 

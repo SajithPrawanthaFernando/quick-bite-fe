@@ -9,6 +9,7 @@ import { Trash2, RefreshCw } from "lucide-react";
 import { ChangeRoleModal } from "@/components/modals/ChangeRoleModal";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 import { useToast } from "@/components/ToastProvider";
+import { notFound } from "next/navigation";
 
 const UsersPage = () => {
   const dispatch = AppDispatch();
@@ -53,6 +54,12 @@ const UsersPage = () => {
     setSelectedUser({ id: userId, role: currentRole });
     setModalOpen(true);
   };
+
+  const user = useSelector((state: RootState) => state.user.users[0]);
+
+  if (!user || !user.roles?.includes("admin")) {
+    notFound();
+  }
 
   return (
     <div className="p-6">

@@ -1,0 +1,97 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-30px); }
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-15px) rotate(-5deg); }
+      75% { transform: translateY(10px) rotate(5deg); }
+    }
+    @keyframes blink {
+      0%, 100% { transform: scaleY(1); }
+      50% { transform: scaleY(0.1); }
+    }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      25% { transform: rotate(-10deg); }
+      75% { transform: rotate(10deg); }
+    }
+    @keyframes dash {
+      to { stroke-dashoffset: -1000; }
+    }
+    .character {
+      animation: float 4s ease-in-out infinite;
+    }
+    .eyes {
+      animation: blink 2.5s ease-in-out infinite;
+    }
+    .question-mark {
+      animation: wiggle 3s ease-in-out infinite;
+    }
+    .spiral {
+      stroke-dasharray: 20;
+      animation: dash 30s linear infinite;
+    }
+    .gear {
+      transform-origin: center;
+      animation: spin 10s linear infinite;
+    }
+    .gear-reverse {
+      transform-origin: center;
+      animation: spin 10s linear infinite reverse;
+    }
+    .computer {
+      animation: bounce 3s ease-in-out infinite;
+    }
+  </style>
+
+
+
+
+
+
+
+  <!-- Broken Computer -->
+  <g class="computer" >
+    <!-- Computer Base -->
+    <rect x="-100" y="-10" width="200" height="140" rx="10" fill="#FDB940"/>
+    <rect x="-90" y="0" width="180" height="120" rx="5" fill="black"/>
+    
+    <!-- Screen with X eyes -->
+    <rect x="-70" y="20" width="140" height="80" rx="5" fill="#FDB940" opacity="0.3"/>
+    
+    <!-- Sad Face -->
+    <g transform="translate(0, 60)">
+      <!-- Eyes -->
+      <g class="eyes">
+        <path d="M-30,-20 L-10,0 M-30,0 L-10,-20" stroke="#FDB940" stroke-width="8" stroke-linecap="round"/>
+        <path d="M30,-20 L10,0 M30,0 L10,-20" stroke="#FDB940" stroke-width="8" stroke-linecap="round"/>
+      </g>
+      
+      <!-- Sad Mouth -->
+      <path d="M-40,30 Q0,10 40,30" stroke="#FDB940" stroke-width="8" fill="none" stroke-linecap="round"/>
+    </g>
+    
+    <!-- Question Mark -->
+    <g class="question-mark" transform="translate(150, -50)">
+      <path d="M0,0 Q30,-30 0,-60 Q-30,-90 0,-90 Q30,-90 30,-60" stroke="#FDB940" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <circle cx="0" cy="-20" r="8" fill="#FDB940"/>
+    </g>
+    
+    <!-- Broken Parts -->
+    <g class="character" transform="translate(-150, -30)">
+      <path d="M0,0 L20,-20 L40,-10 L30,10 Z" fill="#FDB940"/>
+      <circle cx="25" cy="-5" r="8" fill="black"/>
+    </g>
+    
+
+  </g>
+
+  
+</svg>

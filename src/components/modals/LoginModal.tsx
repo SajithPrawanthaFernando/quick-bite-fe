@@ -10,6 +10,10 @@ import { useEffect, useState } from "react";
 import { AppDispatch } from "@/hooks/reduxHooks";
 import { loginUser } from "@/redux/actions/authActions";
 import { useToast } from "../ToastProvider";
+import { redirect, usePathname } from "next/navigation";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { useRouter } from "next/navigation";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -45,18 +49,23 @@ export const LoginModal = ({
 
   const dispatch = AppDispatch();
   const { showToast } = useToast();
+  const users = useSelector((state: RootState) => state.user.users);
+  const user = users[0];
+
+  const router = useRouter();
 
   const onSubmit = async (data: any) => {
     try {
-      const res = await dispatch(loginUser(data.email, data.password));
+      await dispatch(loginUser(data.email, data.password));
+
       showToast("Success", "Login successful!");
       onOpenChange(false);
-    } catch (error) {
-      showToast(
-        "Failed",
-        "Login failed. Please check your credentials.",
-        "error"
-      );
+
+      if (user?.roles?.includes("admin")) {
+        router.push("/admin");
+      }
+    } catch (error: any) {
+      showToast("Failed", error.message || "Login failed", "error");
     }
   };
 

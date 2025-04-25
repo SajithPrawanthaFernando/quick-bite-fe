@@ -5,7 +5,10 @@ import Link from "next/link";
 import { Scan, X, Search } from "lucide-react";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import * as Avatar from "@radix-ui/react-avatar";
-import { usePathname } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
+import { logoutUser } from "@/redux/actions/authActions";
+import { AppDispatch } from "@/hooks/reduxHooks";
+import { useToast } from "./ToastProvider";
 
 const navItems = [
   { name: "Overview", path: "/admin" },
@@ -19,6 +22,14 @@ const navItems = [
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const dispatch = AppDispatch();
+  const { showToast } = useToast();
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    showToast("Logged out", "You have been successfully logged out.");
+    redirect("/");
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
@@ -30,9 +41,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         } md:translate-x-0 md:static`}
       >
         <div className="flex items-center justify-between px-4 py-[13.5px] border-b">
-          <h2 className="text-[26px] font-bold text-black">
-            Quick<span className="text-[#FDB940]">Bite</span>
-          </h2>
+          <Link href="/">
+            <h2 className="text-[26px] font-bold text-black">
+              Quick<span className="text-[#FDB940]">Bite</span>
+            </h2>
+          </Link>
+
           <button className="md:hidden" onClick={() => setSidebarOpen(false)}>
             <X className="w-5 h-5 text-gray-700" />
           </button>
@@ -133,14 +147,18 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
                 className="mt-2 bg-white rounded-md shadow-lg p-2 w-40"
                 sideOffset={5}
               >
-                <DropdownMenu.Item className="text-sm px-3 py-2 hover:bg-gray-100 rounded-md">
+                <DropdownMenu.Item className="text-sm px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-md">
                   Profile
                 </DropdownMenu.Item>
-                <DropdownMenu.Item className="text-sm px-3 py-2 hover:bg-gray-100 rounded-md">
+                <DropdownMenu.Separator className="my-1 border-t" />
+                <DropdownMenu.Item className="text-sm px-3 py-2 hover:bg-gray-100 text-gray-500 rounded-md">
                   Settings
                 </DropdownMenu.Item>
                 <DropdownMenu.Separator className="my-1 border-t" />
-                <DropdownMenu.Item className="text-sm px-3 py-2 hover:bg-gray-100 rounded-md text-red-600">
+                <DropdownMenu.Item
+                  className="text-sm px-3 py-2 hover:bg-gray-100 rounded-md text-red-600"
+                  onClick={handleLogout}
+                >
                   Logout
                 </DropdownMenu.Item>
               </DropdownMenu.Content>

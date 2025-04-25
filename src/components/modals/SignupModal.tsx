@@ -15,13 +15,17 @@ const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup
     .string()
-    .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+    .required("Password is required")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\s]).{8,}$/,
+      "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character"
+    ),
   phone: yup
     .string()
+    .required("Phone number is required")
     .matches(
       /^94\d{9}$/,
-      "Phone must be a valid Sri Lankan number starting with 94"
+      "Phone number must start with 94 and contain 11 digits"
     )
     .required("Phone number is required"),
 });
@@ -30,10 +34,12 @@ export const SignupModal = ({
   open,
   onOpenChange,
   trigger,
+  triggerLogin,
 }: {
   open: boolean;
   onOpenChange: (value: boolean) => void;
   trigger?: React.ReactNode;
+  triggerLogin: () => void;
 }) => {
   const {
     register,
@@ -66,6 +72,7 @@ export const SignupModal = ({
       await dispatch(signupUser(payload));
       showToast("Signup Successful", "You can now log in.");
       onOpenChange(false);
+      triggerLogin();
     } catch (err) {
       showToast("Signup Failed", "Something went wrong.", "error");
     }

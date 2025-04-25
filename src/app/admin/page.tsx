@@ -1,5 +1,12 @@
 "use client";
 
+import { RootState } from "@/redux/store";
+import { useSelector } from "react-redux";
+import NotFoundPage from "../404";
+import Link from "next/link";
+import { notFound } from "next/navigation";
+import { Router, useRouter } from "next/router";
+
 export default function OverviewPage() {
   const cards = [
     {
@@ -45,6 +52,12 @@ export default function OverviewPage() {
       icon: "🔄",
     },
   ];
+
+  const user = useSelector((state: RootState) => state.user.users[0]);
+
+  if (!user || !user.roles?.includes("admin")) {
+    notFound();
+  }
 
   return (
     <div className="p-6">

@@ -21,7 +21,7 @@ export const Header = () => {
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
-  const user1 = useSelector((state: RootState) => state.auth.user);
+  const user1 = useSelector((state: RootState) => state.auth.isAuthenticated);
   const user = {
     name: "Sajith Fernando",
     email: "sajith@example.com",
@@ -57,7 +57,10 @@ export const Header = () => {
 
       {/* Left Section */}
       <div className="flex items-center gap-4">
-        <MenuDrawer />
+        <MenuDrawer
+          onLogin={() => setIsLoginOpen(true)}
+          onSignup={() => setIsSignupOpen(true)}
+        />
         <Link href="/">
           <Image src={logo} alt="QuickBite" className="w-[120px] h-auto" />
         </Link>
@@ -143,6 +146,7 @@ export const Header = () => {
                   Sign up
                 </button>
               }
+              triggerLogin={() => setIsLoginOpen(true)}
             />
           </>
         )}
