@@ -42,6 +42,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {children}
         <Toast.Root
           open={open}
+          duration={3000}
           onOpenChange={setOpen}
           className={`w-[360px] bg-white shadow-md rounded-md p-4 flex flex-col gap-1 z-[9999] fixed bottom-6 right-6 border-l-4 ${borderColor}`}
         >

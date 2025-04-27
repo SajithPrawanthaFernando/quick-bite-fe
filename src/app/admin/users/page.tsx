@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AppDispatch } from "@/hooks/reduxHooks";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers, deleteUser } from "@/redux/actions/usersActions";
 import { RootState } from "@/redux/store";
 import { Trash2, RefreshCw } from "lucide-react";
@@ -10,6 +10,8 @@ import { ChangeRoleModal } from "@/components/modals/ChangeRoleModal";
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
 import { useToast } from "@/components/ToastProvider";
 import { notFound } from "next/navigation";
+import { loginSuccess } from "@/redux/slices/authSlice";
+import Image from "next/image";
 
 const UsersPage = () => {
   const dispatch = AppDispatch();
@@ -55,10 +57,49 @@ const UsersPage = () => {
     setModalOpen(true);
   };
 
-  const user = useSelector((state: RootState) => state.user.users[0]);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
-  if (!user || !user.roles?.includes("admin")) {
-    notFound();
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
+    if (storedUser && token) {
+      const parsedUser = JSON.parse(storedUser);
+
+      if (parsedUser.roles?.includes("admin")) {
+        dispatch(
+          loginSuccess({
+            token,
+            user: parsedUser,
+          })
+        );
+        setIsAuthorized(true);
+      } else {
+        setIsAuthorized(false);
+      }
+    } else {
+      setIsAuthorized(false);
+    }
+
+    setCheckingAuth(false);
+  }, [dispatch]);
+
+  if (checkingAuth) {
+    return (
+      <div className=" flex justify-center items-center mt-[100px]">
+        <Image
+          src="/images/ripples.svg"
+          alt="loading"
+          width={160}
+          height={160}
+        />
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return notFound();
   }
 
   return (
@@ -68,7 +109,16 @@ const UsersPage = () => {
         Manage your platform users from here.
       </p>
 
-      {loading && <p className="text-sm text-gray-500">Loading users...</p>}
+      {loading && (
+        <div className=" flex justify-center items-center mt-[100px]">
+          <Image
+            src="/images/ripples.svg"
+            alt="loading"
+            width={160}
+            height={160}
+          />
+        </div>
+      )}
       {error && <p className="text-red-500 font-medium">Error: {error}</p>}
       {!loading && users.length === 0 && (
         <div className="bg-yellow-50 text-yellow-800 px-4 py-2 rounded mb-4 border border-yellow-200">

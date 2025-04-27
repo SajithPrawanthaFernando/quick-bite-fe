@@ -1,17 +1,30 @@
 "use client";
 
 import { RootState } from "@/redux/store";
-import { useSelector } from "react-redux";
-import NotFoundPage from "../404";
-import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
 import { notFound } from "next/navigation";
-import { Router, useRouter } from "next/router";
+import { loginSuccess } from "@/redux/slices/authSlice";
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import { getAllUsers } from "@/redux/actions/usersActions";
+import { AppDispatch } from "@/redux/store";
 
 export default function OverviewPage() {
+  const dispatch = useDispatch<AppDispatch>();
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+  const { users } = useSelector((state: RootState) => state.user);
+
+  useEffect(() => {
+    dispatch(getAllUsers());
+  }, [dispatch]);
+
+  console.log("Users", users);
+
   const cards = [
     {
       label: "Total Users",
-      value: "12,345",
+      value: users.length,
       growth: "+12%",
       bgColor: "bg-[#FDB940]",
       icon: "👤",
@@ -27,7 +40,7 @@ export default function OverviewPage() {
       label: "Pending Orders",
       value: "2,145",
       growth: "-8%",
-      bgColor: "bg-[#E2E8F0]",
+      bgColor: "bg-violet-500",
       icon: "⏳",
     },
     {
@@ -53,10 +66,46 @@ export default function OverviewPage() {
     },
   ];
 
-  const user = useSelector((state: RootState) => state.user.users[0]);
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
 
-  if (!user || !user.roles?.includes("admin")) {
-    notFound();
+    if (storedUser && token) {
+      const parsedUser = JSON.parse(storedUser);
+
+      if (parsedUser.roles?.includes("admin")) {
+        dispatch(
+          loginSuccess({
+            token,
+            user: parsedUser,
+          })
+        );
+        setIsAuthorized(true);
+      } else {
+        setIsAuthorized(false);
+      }
+    } else {
+      setIsAuthorized(false);
+    }
+
+    setCheckingAuth(false);
+  }, [dispatch]);
+
+  if (checkingAuth) {
+    return (
+      <div className=" flex justify-center items-center mt-[100px]">
+        <Image
+          src="/images/ripples.svg"
+          alt="loading"
+          width={160}
+          height={160}
+        />
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return notFound();
   }
 
   return (
@@ -100,8 +149,8 @@ export default function OverviewPage() {
         {/* Top Customers */}
         <div className="bg-white p-4 shadow rounded-lg">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-lg">Top Customers</h2>
-            <button className="text-blue-600 text-sm underline">
+            <h2 className="font-semibold text-lg text-black">Top Customers</h2>
+            <button className="text-[#FDB940] text-sm underline">
               View All
             </button>
           </div>
@@ -125,15 +174,26 @@ export default function OverviewPage() {
                 orders: 14,
                 amount: "$5,366",
               },
+              {
+                name: "James Bond",
+                country: "UK",
+                orders: 22,
+                amount: "$7,500",
+              },
             ].map((customer, i) => (
-              <li key={i} className="flex justify-between items-center text-sm">
+              <li
+                key={i}
+                className="flex justify-between items-center text-sm text-black/80"
+              >
                 <div>
                   <div className="font-semibold">{customer.name}</div>
                   <div className="text-gray-500 text-xs">
                     {customer.country} • {customer.orders} Orders
                   </div>
                 </div>
-                <div className="font-bold">{customer.amount}</div>
+                <div className="font-semibold text-black/80">
+                  {customer.amount}
+                </div>
               </li>
             ))}
           </ul>

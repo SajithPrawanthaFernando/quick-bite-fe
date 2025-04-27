@@ -1,7 +1,8 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { X } from "lucide-react";
+import * as Select from "@radix-ui/react-select";
+import { Check, ChevronDown, X } from "lucide-react";
 import { useState } from "react";
 import { AppDispatch } from "@/hooks/reduxHooks";
 import { useToast } from "../ToastProvider";
@@ -34,7 +35,7 @@ export const ChangeRoleModal = ({
       showToast("Role Updated", `User role changed to ${role}`);
       onOpenChange(false);
     } catch (err) {
-      showToast("Update Failed", "Could not change user role");
+      showToast("Update Failed", "Could not change user role", "error");
     } finally {
       setLoading(false);
     }
@@ -52,22 +53,45 @@ export const ChangeRoleModal = ({
             Change User Role
           </Dialog.Title>
 
+          {/* Role Selector */}
           <div className="space-y-3">
-            <label className="text-sm text-gray-600 font-medium ">
+            <label className="text-sm text-gray-600 font-medium">
               Select New Role
             </label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="w-full border mt-1.5 border-gray-300 px-3 py-2 text-[15px] rounded-md text-black focus:ring-[#FDB940] focus:outline-none focus:ring-1"
-            >
-              <option value="user">User</option>
-              <option value="admin">Admin</option>
-              <option value="restaurantOwner">Restaurant Owner</option>
-              <option value="driver">Driver</option>
-            </select>
+            <Select.Root value={role} onValueChange={setRole}>
+              <Select.Trigger className="w-full border border-gray-300 px-3 py-2 rounded-md text-left text-black focus:ring-1 focus:ring-[#FDB940] focus:outline-none flex items-center justify-between">
+                <Select.Value placeholder="Select Role" />
+                <Select.Icon>
+                  <ChevronDown className="text-gray-500" />
+                </Select.Icon>
+              </Select.Trigger>
+
+              <Select.Portal>
+                <Select.Content
+                  sideOffset={5}
+                  position="popper"
+                  className="bg-white border w-[200px] border-gray-300 rounded-md shadow-md z-[100]"
+                >
+                  <Select.Viewport className="p-1">
+                    {["user", "admin", "restaurantOwner", "driver"].map((r) => (
+                      <Select.Item
+                        key={r}
+                        value={r}
+                        className="flex items-center px-3 py-2 text-black hover:bg-gray-100 rounded-md cursor-pointer text-sm"
+                      >
+                        <Select.ItemText>{r}</Select.ItemText>
+                        <Select.ItemIndicator className="ml-auto">
+                          <Check className="w-4 h-4 text-[#FDB940]" />
+                        </Select.ItemIndicator>
+                      </Select.Item>
+                    ))}
+                  </Select.Viewport>
+                </Select.Content>
+              </Select.Portal>
+            </Select.Root>
           </div>
 
+          {/* Buttons */}
           <div className="mt-6 flex justify-end gap-3">
             <button
               type="button"
@@ -79,7 +103,7 @@ export const ChangeRoleModal = ({
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="px-4 py-2 bg-black text-white rounded-md hover:bg-[#FDB940] hover:text-black text-sm  transition"
+              className="px-4 py-2 bg-black text-white rounded-md hover:bg-[#FDB940] hover:text-black text-sm transition"
             >
               {loading ? "Updating..." : "Update"}
             </button>
