@@ -6,6 +6,7 @@ import { customerService } from '@/redux/services/customer.service';
 import { Restaurant } from '@/types/restaurant';
 import Image from 'next/image';
 import { Header } from '@/components';
+import { PromoSection } from '@/components/promo-card/promo-section';
 interface Category {
   name: string;
   image: string;
@@ -135,7 +136,7 @@ export default function RestaurantsPage() {
       
      
       {/* Categories */}
-      <div className="bg-white py-4 shadow-sm px-10">
+      <div className="bg-white py-4 px-10">
         <div className="flex overflow-x-auto px-6 gap-4">
           {categories.map((category) => (
             <div
@@ -150,11 +151,11 @@ export default function RestaurantsPage() {
         </div>
       </div>
  {/* Filters Dropdowns */}
-<div className="bg-white py-4 shadow-sm px-6 flex gap-4 items-center flex-nowrap px-40">
+<div className="bg-white py-4 flex gap-4 items-center flex-nowrap px-20">
   <select
     value={priceRange}
     onChange={(e) => setPriceRange(e.target.value)}
-    className="bg-gray-200 rounded-full px-4 py-2 font-bold text-sm"
+    className="bg-gray-200 rounded-full px-4 py-2 text-sm"
   >
     <option value="">Price Range</option>
     <option value="low">Low (≤ $200)</option>
@@ -165,7 +166,7 @@ export default function RestaurantsPage() {
   <select
     value={deliveryFeeRange}
     onChange={(e) => setDeliveryFeeRange(e.target.value)}
-    className="bg-gray-200 rounded-full px-4 py-2 font-bold text-sm"
+    className="bg-gray-200 rounded-full px-4 py-2 text-sm"
   >
     <option value="">Delivery Fee</option>
     <option value="under50">Under ₹50</option>
@@ -178,7 +179,7 @@ export default function RestaurantsPage() {
   <select
     value={ratingRange}
     onChange={(e) => setRatingRange(e.target.value)}
-    className="bg-gray-200 rounded-full px-4 py-2 font-bold text-sm"
+    className="bg-gray-200 rounded-full px-4 py-2  text-sm"
   >
     <option value="">Rating Range</option>
     <option value="1-2">1-2</option>
@@ -189,7 +190,7 @@ export default function RestaurantsPage() {
   <select
     value={sortOption}
     onChange={(e) => setSortOption(e.target.value)}
-    className="bg-gray-200 rounded-full px-4 py-2 font-bold text-sm"
+    className="bg-gray-200 rounded-full px-4 py-2 text-sm"
   >
     <option value="">Sort</option>
     <option value="rating">Rating High to Low</option>
@@ -200,8 +201,11 @@ export default function RestaurantsPage() {
 
  
 
-
-      
+<PromoSection/>
+<div className="px-10 pt-6 pb-2 flex justify-between items-center">
+        <h2 className="text-2xl font-bold px-10">Most loved deals on QuickBite</h2>
+        <button className="text-sm font-medium pr-14">See all</button>
+      </div>   
  
       {/* Restaurants */}
       
