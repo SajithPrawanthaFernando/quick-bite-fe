@@ -4,11 +4,13 @@ import * as Label from "@radix-ui/react-label";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { HowItWorksSection, WhyQuickBiteSection } from "@/components";
 import { AppDispatch } from "@/hooks/reduxHooks";
 import { useToast } from "@/components/ToastProvider";
 import { signupUser } from "@/redux/actions/authActions";
+import { useRouter, useSearchParams } from "next/navigation";
+import { LoginModal } from "@/components/modals/LoginModal";
 
 // Validation schema
 const schema = yup.object().shape({
@@ -43,12 +45,22 @@ export default function RestaurantOwnerRegisterPage() {
     resolver: yupResolver(schema),
   });
 
+  const router = useRouter();
+
   useEffect(() => {
     setFocus("firstName");
   }, [setFocus]);
 
+  const searchParams = useSearchParams();
   const dispatch = AppDispatch();
   const { showToast } = useToast();
+  const [loginOpen, setLoginOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("login") === "true") {
+      setLoginOpen(true);
+    }
+  }, [searchParams]);
 
   const onSubmit = async (data: any) => {
     const payload = {
@@ -68,6 +80,7 @@ export default function RestaurantOwnerRegisterPage() {
         "Our team will get in touch with you."
       );
       reset();
+      router.push("/");
     } catch (error) {
       showToast("Registration failed", "Please try again later.", "error");
     }
@@ -222,6 +235,7 @@ export default function RestaurantOwnerRegisterPage() {
             </button>
           </form>
         </div>
+        <LoginModal open={loginOpen} onOpenChange={setLoginOpen} />
       </div>
 
       <WhyQuickBiteSection />

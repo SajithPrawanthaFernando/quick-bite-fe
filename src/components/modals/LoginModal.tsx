@@ -56,15 +56,17 @@ export const LoginModal = ({
 
   const onSubmit = async (data: any) => {
     try {
-      await dispatch(loginUser(data.email, data.password));
+      const loggedInUser = await dispatch(loginUser(data.email, data.password));
 
       showToast("Success", "Login successful!");
       onOpenChange(false);
 
-      if (user?.roles?.includes("admin")) {
+      if (loggedInUser?.roles?.includes("admin")) {
         router.push("/admin");
       } else if(user?.roles?.includes("driver")){
         router.push("/driver");
+      } else {
+        router.push("/");
       }
     } catch (error: any) {
       showToast("Failed", error.message || "Login failed", "error");
@@ -74,7 +76,7 @@ export const LoginModal = ({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Trigger asChild>
-        {trigger ? trigger : <button>Login</button>}
+        {trigger ? trigger : <button className="hidden">Login</button>}
       </Dialog.Trigger>
 
       <Dialog.Portal>
@@ -87,7 +89,7 @@ export const LoginModal = ({
           `}
         >
           <Dialog.Title className="text-xl font-semibold text-black mb-4">
-            Log in to QuickBite
+            Log in to Quick<span className="text-[#FDB940]">Bite</span>
           </Dialog.Title>
 
           <Dialog.Description className="text-sm text-gray-500 mb-6">
