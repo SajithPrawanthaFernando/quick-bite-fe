@@ -11,7 +11,7 @@ interface Category {
   image: string;
 }
 
-export default function Home() {
+export default function RestaurantsPage() {
   const router = useRouter();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [loading, setLoading] = useState(true);
