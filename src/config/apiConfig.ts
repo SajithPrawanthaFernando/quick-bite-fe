@@ -6,3 +6,4 @@ export const USER_LOGOUT = "/auth/logout";
 export const GET_ALL_USERS = "/users/all";
 export const CHANGE_USER_ROLE = (id: string) => `/users/${id}/role`;
 export const DELETE_USER = (id: string) => `/users/${id}`;
+export const GET_DELIVERIES = (id: string) => `/deliveries/${id}/by-driver`;

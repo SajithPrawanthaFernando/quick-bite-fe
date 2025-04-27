@@ -19,3 +19,6 @@ export const userApi = createAxiosInstance(
 export const orderApi = createAxiosInstance(
   process.env.NEXT_PUBLIC_ORDER_SERVICE!
 );
+export const deliveryApi = createAxiosInstance(
+  process.env.NEXT_PUBLIC_DELIVERY_SERVICE!
+);

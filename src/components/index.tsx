@@ -7,3 +7,4 @@ export * from "./DeliverWithQuickBite";
 export * from "./MakeMoneySection";
 export * from "./HowItWorksSteps";
 export * from "./DashboardLayout";
+export * from "./DriverDashboard";

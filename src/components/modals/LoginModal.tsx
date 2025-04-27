@@ -63,6 +63,8 @@ export const LoginModal = ({
 
       if (user?.roles?.includes("admin")) {
         router.push("/admin");
+      } else if(user?.roles?.includes("driver")){
+        router.push("/driver");
       }
     } catch (error: any) {
       showToast("Failed", error.message || "Login failed", "error");

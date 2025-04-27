@@ -14,12 +14,13 @@ export const ProvidersWrapper = ({
 
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
+  const isDriver = pathname?.startsWith("/driver");
 
   return (
     <ToastProvider>
-      {!isAdmin && <Header />}
+      {!(isAdmin || isDriver) && <Header />}
       {children}
-      {!isAdmin && <Footer />}
+      {!(isAdmin || isDriver) && <Footer />}
     </ToastProvider>
   );
 };
