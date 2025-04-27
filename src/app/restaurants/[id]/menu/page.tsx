@@ -172,9 +172,9 @@ export default function MenuPage() {
         )}
 
         {/* Restaurant Info */}
-        <div className="p-6 w-full flex sm:flex-row flex-col rounded-xl space-y-4">
+        <div className="py-6 pr-6 w-full flex sm:flex-row flex-col rounded-xl space-y-4">
           {/* Left side Restaurant Details */}
-          <div className="flex flex-col sm:w-1/2 w-full sm:mr-8">
+          <div className="flex flex-col sm:w-1/2 w-full sm:mr-8"> 
             <h1 className="text-[32px] font-bold text-gray-900">{restaurant.name}</h1>
             <div className="flex items-center space-x-2">
   <StarIcon className="h-5 w-5 text-yellow-400" />
@@ -202,7 +202,7 @@ export default function MenuPage() {
         </div>
       </main>
 
-      <div className="flex items-center justify-center space-x-4 pr-[20px]">
+      <div className="flex items-center justify-center space-x-4 px-[170px]">
   {/* Fixed Opening Hours Box */}
   <div className="w-auto max-w-[220px] p-3 rounded-lg border border-gray-200 shadow-sm bg-white z-20">
     {/* Opening Hours */}
@@ -237,7 +237,7 @@ export default function MenuPage() {
 </div>
 
       {/* Menu Section */}
-<div className="max-w-screen-lg mx-auto rounded-lg mx-auto px-[0px] lg p-4 mb-5 mt-6">
+<div className="max-w-screen-lg mx-auto rounded-lg   lg py-4 mb-5 mt-6">
   <h2 className="text-xl font-bold text-gray-900 mb-4">Featured items</h2>
   {/* Featured Items */}
 
@@ -246,7 +246,7 @@ export default function MenuPage() {
       <p className="text-gray-500">No menu items available</p>
     </div>
   ) : (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 pl-1">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 ml-[-15px]">
       {filteredMenuItems.map((item) => (
         <div
           key={item._id}
@@ -301,7 +301,7 @@ export default function MenuPage() {
 
       {/* Modal Popup */}
       {showModal && selectedItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 modal-animation ">
           <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl p-6 flex flex-col md:flex-row relative">
             <button
               onClick={() => setShowModal(false)}

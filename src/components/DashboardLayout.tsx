@@ -63,12 +63,12 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Sidebar */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-white border-r transition-transform duration-200 ease-in-out 
+        className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-white border-r border-gray-300 transition-transform duration-200 ease-in-out 
         ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } md:translate-x-0 md:static`}
       >
-        <div className="flex items-center justify-between px-4 py-[13.5px] border-b">
+        <div className="flex items-center justify-between px-4 py-[13.5px] border-b border-gray-300">
           <Link href="/">
             <h2 className="text-[26px] font-bold text-black">
               Quick<span className="text-[#FDB940]">Bite</span>
@@ -100,7 +100,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Topbar */}
-        <header className="flex items-center justify-between px-6 py-3 border-b bg-white">
+        <header className="flex items-center justify-between px-6 py-3 border-b border-gray-300 bg-white">
           {/* Left: Search Bar */}
           <div className="flex items-center gap-4 w-full max-w-[360px]">
             <div className="relative w-full">
@@ -121,7 +121,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
           {/* Right: Action Buttons & Icons */}
           <div className="flex items-center gap-3 ml-auto">
             {/* Store Selector */}
-            <div className="flex items-center border px-3 py-1 rounded-md gap-2 text-sm">
+            <div className="flex items-center border border-gray-300 px-3 py-1 rounded-md gap-2 text-sm">
               <img
                 src="/images/logo3.png"
                 alt="store"

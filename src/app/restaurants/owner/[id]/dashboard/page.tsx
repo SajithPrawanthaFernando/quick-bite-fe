@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { restaurantService } from '@/redux/services/restaurant.service';
 import { availabilityService } from '@/redux/services/availability.service';
+import * as Dialog from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
 export default function RestaurantOwnerDashboard() {
   const params = useParams();
   const restaurantId = params.id as string;
@@ -162,7 +164,7 @@ export default function RestaurantOwnerDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="min-h-screen bg-gray-100 p-8 pt-[80px]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -205,7 +207,7 @@ export default function RestaurantOwnerDashboard() {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold text-gray-700 mb-2">Total Earnings</h3>
             <p className="text-3xl font-bold text-gray-900">
@@ -229,7 +231,7 @@ export default function RestaurantOwnerDashboard() {
         </div>
 
         {/* Recent Orders */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-lg shadow mb-4 overflow-hidden">
           <div className="p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Recent Orders</h2>
             {orders.length === 0 ? (
@@ -276,12 +278,12 @@ export default function RestaurantOwnerDashboard() {
         </div>
 
         {/* Menu Items Section */}
-        <div className="bg-white rounded-lg shadow overflow-hidden mb-8">
+        <div className="bg-white  overflow-hidden mb-8">
           <div className="p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Menu Items</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {menuItems.map((item) => (
-                <div key={item._id} className="border rounded-lg p-4">
+                <div key={item._id} className="p-4">
                   {item.image && (
                     <img src={item.image} alt={item.name} className="w-full h-32 object-cover rounded mb-2" />
                   )}
@@ -382,27 +384,133 @@ export default function RestaurantOwnerDashboard() {
 
       {/* Add Menu Item Modal */}
       {showAddMenuModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-30 flex justify-center items-center z-50">
-          <div className="bg-white p-6 rounded-lg w-[400px] shadow-lg">
-            <h2 className="text-lg font-semibold mb-4">Add Menu Item</h2>
-            <div className="flex flex-col gap-3">
-              <input type="text" placeholder="Name" className="border p-2 rounded" value={menuForm.name} onChange={(e) => setMenuForm({ ...menuForm, name: e.target.value })} />
-              <textarea placeholder="Description" className="border p-2 rounded" value={menuForm.description} onChange={(e) => setMenuForm({ ...menuForm, description: e.target.value })} />
-              <input type="number" placeholder="Price" className="border p-2 rounded" value={menuForm.price} onChange={(e) => setMenuForm({ ...menuForm, price: e.target.value })} />
-              <input type="text" placeholder="Image URL" className="border p-2 rounded" value={menuForm.image} onChange={(e) => setMenuForm({ ...menuForm, image: e.target.value })} />
-              <input type="text" placeholder="Category" className="border p-2 rounded" value={menuForm.category} onChange={(e) => setMenuForm({ ...menuForm, category: e.target.value })} />
-              <label className="flex items-center gap-2">
-                <input type="checkbox" checked={menuForm.isAvailable} onChange={(e) => setMenuForm({ ...menuForm, isAvailable: e.target.checked })} />
-                Available
-              </label>
-              <div className="flex justify-end gap-2 mt-4">
-                <button className="bg-gray-300 text-gray-700 px-4 py-2 rounded" onClick={() => setShowAddMenuModal(false)}>Cancel</button>
-                <button className="bg-green-600 text-white px-4 py-2 rounded" onClick={handleAddMenuItem}>Add</button>
-              </div>
-            </div>
+  <Dialog.Root open={showAddMenuModal} onOpenChange={(open) => setShowAddMenuModal(open)}>
+    <Dialog.Trigger asChild>
+      {/* Hidden button or a trigger */}
+      <button className="hidden">Add Menu</button>
+    </Dialog.Trigger>
+
+    <Dialog.Portal>
+      <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
+      <Dialog.Content
+        className="fixed top-1/2 left-1/2 z-100 w-[90%] max-w-md transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded-lg shadow-xl modal-animation"
+      >
+        <Dialog.Title className="text-xl font-semibold text-black mb-4">
+          Add Menu Item
+        </Dialog.Title>
+
+        <form className="space-y-4">
+          <div className="flex flex-col">
+            <label htmlFor="name" className="text-sm font-medium text-gray-700">
+              Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              placeholder="Name"
+              className="mt-1 border border-gray-300 rounded-md text-black px-3 py-2 focus:outline-none focus:ring focus:ring-[#FDB940]"
+              value={menuForm.name}
+              onChange={(e) => setMenuForm({ ...menuForm, name: e.target.value })}
+            />
           </div>
-        </div>
-      )}
+
+          <div className="flex flex-col">
+            <label htmlFor="description" className="text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <textarea
+              id="description"
+              placeholder="Description"
+              className="mt-1 border border-gray-300 rounded-md text-black px-3 py-2 focus:outline-none focus:ring focus:ring-[#FDB940]"
+              value={menuForm.description}
+              onChange={(e) => setMenuForm({ ...menuForm, description: e.target.value })}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="price" className="text-sm font-medium text-gray-700">
+              Price
+            </label>
+            <input
+              id="price"
+              type="number"
+              placeholder="Price"
+              className="mt-1 border border-gray-300 rounded-md text-black px-3 py-2 focus:outline-none focus:ring focus:ring-[#FDB940]"
+              value={menuForm.price}
+              onChange={(e) => setMenuForm({ ...menuForm, price: e.target.value })}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="image" className="text-sm font-medium text-gray-700">
+              Image URL
+            </label>
+            <input
+              id="image"
+              type="text"
+              placeholder="Image URL"
+              className="mt-1 border border-gray-300 rounded-md text-black px-3 py-2 focus:outline-none focus:ring focus:ring-[#FDB940]"
+              value={menuForm.image}
+              onChange={(e) => setMenuForm({ ...menuForm, image: e.target.value })}
+            />
+          </div>
+
+          <div className="flex flex-col">
+            <label htmlFor="category" className="text-sm font-medium text-gray-700">
+              Category
+            </label>
+            <input
+              id="category"
+              type="text"
+              placeholder="Category"
+              className="mt-1 border border-gray-300 rounded-md text-black px-3 py-2 focus:outline-none focus:ring focus:ring-[#FDB940]"
+              value={menuForm.category}
+              onChange={(e) => setMenuForm({ ...menuForm, category: e.target.value })}
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <input
+              id="isAvailable"
+              type="checkbox"
+              checked={menuForm.isAvailable}
+              onChange={(e) => setMenuForm({ ...menuForm, isAvailable: e.target.checked })}
+            />
+            <label htmlFor="isAvailable" className="text-sm text-gray-700">
+              Available
+            </label>
+          </div>
+
+          <div className="flex justify-end gap-2 mt-4">
+            <button
+              type="button"
+              className="bg-gray-300 text-gray-700 px-4 py-2 rounded"
+              onClick={() => setShowAddMenuModal(false)}
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              className="bg-[#FDB940] text-white px-4 py-2 rounded"
+              onClick={handleAddMenuItem}
+            >
+              Add
+            </button>
+          </div>
+        </form>
+
+        <Dialog.Close asChild>
+          <button
+            className="absolute top-4 right-4 text-gray-500 hover:text-black"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </Dialog.Close>
+      </Dialog.Content>
+    </Dialog.Portal>
+  </Dialog.Root>
+)}
 
       {/* Add Special Day Modal */}
       {showAddSpecialDayModal && (
