@@ -151,6 +151,7 @@ export default function MenuPage() {
     <div className="min-h-screen bg-white relative pt-[80px]">
       <h1 className="mb-12"></h1>
       <main className="max-w-screen-lg mx-auto pl-0 pr-10 -mt-12 relative z-10 space-y-2">
+  {/* Restaurant Background Image */}
   {restaurant.logo && (
     <div className="relative h-[250px] w-[1044px] rounded-xl overflow-hidden">
       <img
@@ -159,9 +160,10 @@ export default function MenuPage() {
         className="object-cover w-full h-full rounded-xl"
       />
 
+      {/* Heart Button */}
       <button
         onClick={() => setLiked(!liked)}
-        className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md"
+        className="absolute top-4 right-4 z-10 bg-white rounded-full p-2 shadow-md"
       >
         {liked ? (
           <SolidHeartIcon className="h-5 w-5 text-red-500" />
@@ -169,16 +171,46 @@ export default function MenuPage() {
           <OutlineHeartIcon className="h-5 w-5 text-gray-800 hover:text-red-500" />
         )}
       </button>
-
-      {/* Remove the black overlay! */}
     </div>
   )}
 
   {/* Restaurant Info */}
   <div className="py-6 pr-6 w-full flex sm:flex-row flex-col rounded-xl space-y-4">
-    {/* ... your other content ... */}
+    {/* Left side Restaurant Details */}
+    <div className="flex flex-col sm:w-1/2 w-full sm:mr-8">
+      <h1 className="text-[32px] font-bold text-gray-900">{restaurant.name}</h1>
+
+      <div className="flex items-center space-x-2 mt-2">
+        <StarIcon className="h-5 w-5 text-yellow-400" />
+        <span className="ml-1 text-gray-600 text-sm">4.5</span>
+        <span className="mx-2 text-gray-400">•</span>
+        <span className="text-gray-600 text-sm">{restaurant.cuisineType}</span>
+        <span className="mx-2 text-gray-400">•</span>
+        <span
+          className={`text-sm font-semibold ${
+            restaurant.isTemporarilyClosed ? "text-red-500" : "text-green-600"
+          }`}
+        >
+          {restaurant.isTemporarilyClosed ? "Closed" : "Open"}
+        </span>
+      </div>
+
+      <p className="mt-3 text-gray-600 text-sm">{restaurant.description}</p>
+      <p className="mt-3 text-gray-600 text-sm">{restaurant.address}</p>
+
+      {/* You can add Delivery Fee and Time info here */}
+      <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:gap-6 text-sm text-gray-700">
+        {/* Example:
+        <div>Delivery Fee: $3</div>
+        <div>Est. Time: 30-40 min</div> 
+        */}
+      </div>
+    </div>
+
+    {/* Right Side (if you want to add something later) */}
   </div>
 </main>
+
 
       <div className="flex items-center justify-center space-x-4 px-[170px]">
   {/* Fixed Opening Hours Box */}
