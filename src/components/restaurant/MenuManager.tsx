@@ -39,7 +39,7 @@ export default function MenuManager({ restaurant }: MenuManagerProps) {
         </button>
       </div>
 
-      <div className="space-y-4">
+     {/* <div className="space-y-4">
         {restaurant.menu.map((item) => (
           <div
             key={item.id}
@@ -69,7 +69,7 @@ export default function MenuManager({ restaurant }: MenuManagerProps) {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
 
       {/* Add/Edit Item Modal would go here */}
     </div>
