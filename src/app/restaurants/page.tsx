@@ -204,7 +204,9 @@ export default function RestaurantsPage() {
       
  
       {/* Restaurants */}
+      
       <div className="max-w-screen-xl bg-white mx-auto p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-x-2 gap-y-6">
+        
         {sortedRestaurants.map((restaurant) => (
           <div
             key={restaurant._id}

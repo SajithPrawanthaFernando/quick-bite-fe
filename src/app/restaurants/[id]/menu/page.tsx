@@ -150,57 +150,35 @@ export default function MenuPage() {
   return (
     <div className="min-h-screen bg-white relative pt-[80px]">
       <h1 className="mb-12"></h1>
-      <main className="max-w-screen-lg mx-auto pl-[0px] pr-[40px] -mt-12 relative z-10 space-y-2">
-        {/* Restaurant Background Image */}
-        {restaurant.logo && (
-          <div className="relative h-[250px] w-[1044px] mx-auto mb-6 rounded-xl overflow-hidden">
-            <h1>{restaurant.logo}</h1>
-            <img
-              src={restaurant.logo}
-              alt={restaurant.name}
-              className="object-cover w-full h-full rounded-xl"
-            />
-            <button onClick={() => setLiked(!liked)} className="absolute -top-2.5 right-12 z-10">
-              {liked ? (
-                <SolidHeartIcon className="h-9 w-9 text-red-500" />
-              ) : (
-                <OutlineHeartIcon className="h-9 w-9 text-black-800 hover:text-red-500" />
-              )}
-            </button>
-            <div className="absolute inset-0 bg-black bg-opacity-40" />
-          </div>
+      <main className="max-w-screen-lg mx-auto pl-0 pr-10 -mt-12 relative z-10 space-y-2">
+  {restaurant.logo && (
+    <div className="relative h-[250px] w-[1044px] rounded-xl overflow-hidden">
+      <img
+        src={restaurant.logo}
+        alt={restaurant.name}
+        className="object-cover w-full h-full rounded-xl"
+      />
+
+      <button
+        onClick={() => setLiked(!liked)}
+        className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-md"
+      >
+        {liked ? (
+          <SolidHeartIcon className="h-5 w-5 text-red-500" />
+        ) : (
+          <OutlineHeartIcon className="h-5 w-5 text-gray-800 hover:text-red-500" />
         )}
+      </button>
 
-        {/* Restaurant Info */}
-        <div className="py-6 pr-6 w-full flex sm:flex-row flex-col rounded-xl space-y-4">
-          {/* Left side Restaurant Details */}
-          <div className="flex flex-col sm:w-1/2 w-full sm:mr-8"> 
-            <h1 className="text-[32px] font-bold text-gray-900">{restaurant.name}</h1>
-            <div className="flex items-center space-x-2">
-  <StarIcon className="h-5 w-5 text-yellow-400" />
-  <span className="ml-1 text-gray-600 text-sm">4.5</span>
-  <span className="mx-2 text-gray-400">•</span>
-  <span className="text-gray-600 text-sm">{restaurant.cuisineType}</span>
-  <span className="mx-2 text-gray-400">•</span>
-  <span
-    className={`text-sm font-semibold ${
-      restaurant.isTemporarilyClosed ? "text-red-500" : "text-green-600"
-    }`}
-  >
-    {restaurant.isTemporarilyClosed ? "Closed" : "Open"}
-  </span>
-  
-</div>
+      {/* Remove the black overlay! */}
+    </div>
+  )}
 
-<p className="mt-3 text-gray-600 text-sm">{restaurant.description}</p>
-            <p className="mt-3 text-gray-600 text-sm">{restaurant.address}</p>
-            {/* Delivery Fee and Time */}
-            <div className="mt-4 flex flex-col sm:flex-row sm:items-center sm:gap-6 text-sm text-gray-700">
-             
-            </div>
-          </div>
-        </div>
-      </main>
+  {/* Restaurant Info */}
+  <div className="py-6 pr-6 w-full flex sm:flex-row flex-col rounded-xl space-y-4">
+    {/* ... your other content ... */}
+  </div>
+</main>
 
       <div className="flex items-center justify-center space-x-4 px-[170px]">
   {/* Fixed Opening Hours Box */}
