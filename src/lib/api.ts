@@ -22,3 +22,6 @@ export const orderApi = createAxiosInstance(
 export const deliveryApi = createAxiosInstance(
   process.env.NEXT_PUBLIC_DELIVERY_SERVICE!
 );
+export const restaurantApi = createAxiosInstance(
+  process.env.NEXT_PUBLIC_RESTAURANT_SERVICE!
+);

@@ -32,9 +32,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setOpen(true);
   };
 
-  const borderColor =
-    variant === "error" ? "border-red-500" : "border-[#FDB940]";
-  const titleColor = variant === "error" ? "text-red-600" : "text-[#FDB940]";
+  const borderColor = variant === "error" ? "border-red-500" : "border-green-500";
+  const titleColor = variant === "error" ? "text-red-600" : "text-green-600";
 
   return (
     <ToastContext.Provider value={{ showToast }}>
