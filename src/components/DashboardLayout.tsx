@@ -9,14 +9,42 @@ import { redirect, usePathname } from "next/navigation";
 import { logoutUser } from "@/redux/actions/authActions";
 import { AppDispatch } from "@/hooks/reduxHooks";
 import { useToast } from "./ToastProvider";
+import { MdDashboard } from "react-icons/md";
+import {
+  FaUsers,
+  FaStore,
+  FaMotorcycle,
+  FaClipboardList,
+  FaChartBar,
+} from "react-icons/fa";
 
 const navItems = [
-  { name: "Overview", path: "/admin" },
-  { name: "Users", path: "/admin/users" },
-  { name: "Restaurants", path: "/admin/restaurants" },
-  { name: "Riders", path: "/admin/riders" },
-  { name: "Orders", path: "/admin/orders" },
-  { name: "Reports", path: "/admin/reports" },
+  {
+    name: "Overview",
+    path: "/admin",
+    icon: <MdDashboard className="size-4" />,
+  },
+  { name: "Users", path: "/admin/users", icon: <FaUsers className="size-4" /> },
+  {
+    name: "Restaurants",
+    path: "/admin/restaurants",
+    icon: <FaStore className="size-4" />,
+  },
+  {
+    name: "Riders",
+    path: "/admin/riders",
+    icon: <FaMotorcycle className="size-4" />,
+  },
+  {
+    name: "Orders",
+    path: "/admin/orders",
+    icon: <FaClipboardList className="size-4" />,
+  },
+  {
+    name: "Reports",
+    path: "/admin/reports",
+    icon: <FaChartBar className="size-4" />,
+  },
 ];
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -56,12 +84,13 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             <Link
               key={item.name}
               href={item.path}
-              className={`px-4 py-2 rounded-md text-sm font-medium ${
+              className={`flex items-center gap-3 px-4 py-2 rounded-md text-sm font-medium ${
                 pathname === item.path
                   ? "bg-[#FDB940] text-black"
                   : "text-gray-700 hover:bg-gray-100"
               }`}
             >
+              {item.icon}
               {item.name}
             </Link>
           ))}

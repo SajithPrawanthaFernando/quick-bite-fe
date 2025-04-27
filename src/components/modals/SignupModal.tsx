@@ -95,7 +95,7 @@ export const SignupModal = ({
           `}
         >
           <Dialog.Title className="text-xl font-semibold text-black mb-4">
-            Sign up for QuickBite
+            Sign up for Quick<span className="text-[#FDB940]">Bite</span>
           </Dialog.Title>
 
           <Dialog.Description className="text-sm text-gray-500 mb-6">
