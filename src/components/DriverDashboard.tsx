@@ -9,6 +9,7 @@ import { redirect, usePathname } from "next/navigation";
 import { logoutUser } from "@/redux/actions/authActions";
 import { AppDispatch } from "@/hooks/reduxHooks";
 import { useToast } from "./ToastProvider";
+import { SearchProvider, useSearch } from "@/components/SearchContext";
 
 const navItems = [
   { name: "Ongoing Order", path: "/driver" },
@@ -17,7 +18,17 @@ const navItems = [
 ];
 
 export function DriverDashboard({ children }: { children: React.ReactNode }) {
+  return (
+    <SearchProvider>
+      <DashboardContent>{children}</DashboardContent>
+    </SearchProvider>
+  );
+}
+
+// Move all logic here AFTER SearchProvider
+function DashboardContent({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { searchTerm, setSearchTerm } = useSearch(); // ✅ now it is safe
   const pathname = usePathname();
   const dispatch = AppDispatch();
   const { showToast } = useToast();
@@ -31,19 +42,14 @@ export function DriverDashboard({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50">
       {/* Sidebar */}
-      <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-white border-r transition-transform duration-200 ease-in-out 
-        ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:translate-x-0 md:static`}
-      >
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 transform bg-white border-r transition-transform duration-200 ease-in-out 
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 md:static`}>
         <div className="flex items-center justify-between px-4 py-[13.5px] border-b">
           <Link href="/">
             <h2 className="text-[26px] font-bold text-black">
               Quick<span className="text-[#FDB940]">Bite</span>
             </h2>
           </Link>
-
           <button className="md:hidden" onClick={() => setSidebarOpen(false)}>
             <X className="w-5 h-5 text-gray-700" />
           </button>
@@ -54,9 +60,7 @@ export function DriverDashboard({ children }: { children: React.ReactNode }) {
               key={item.name}
               href={item.path}
               className={`px-4 py-2 rounded-md text-sm font-medium ${
-                pathname === item.path
-                  ? "bg-[#FDB940] text-black"
-                  : "text-gray-700 hover:bg-gray-100"
+                pathname === item.path ? "bg-[#FDB940] text-black" : "text-gray-700 hover:bg-gray-100"
               }`}
             >
               {item.name}
@@ -65,15 +69,15 @@ export function DriverDashboard({ children }: { children: React.ReactNode }) {
         </nav>
       </aside>
 
-      {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Topbar */}
         <header className="flex items-center justify-between px-6 py-3 border-b bg-white">
-          {/* Left: Search Bar */}
           <div className="flex items-center gap-4 w-full max-w-[360px]">
             <div className="relative w-full">
               <input
                 type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search"
                 className="w-full pl-10 pr-12 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-1 focus:ring-[#FDB940]"
               />
@@ -87,27 +91,19 @@ export function DriverDashboard({ children }: { children: React.ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3 ml-auto">
-
             {/* Avatar */}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button className="focus:outline-none">
                   <Avatar.Root className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 overflow-hidden">
-                    <Avatar.Image
-                      src="/images/user.jpg"
-                      alt="Admin"
-                      className="h-full w-full object-cover"
-                    />
+                    <Avatar.Image src="/images/user.jpg" alt="Admin" className="h-full w-full object-cover" />
                     <Avatar.Fallback className="text-sm font-medium text-black">
                       AF
                     </Avatar.Fallback>
                   </Avatar.Root>
                 </button>
               </DropdownMenu.Trigger>
-              <DropdownMenu.Content
-                className="mt-2 bg-white rounded-md shadow-lg p-2 w-40"
-                sideOffset={5}
-              >
+              <DropdownMenu.Content className="mt-2 bg-white rounded-md shadow-lg p-2 w-40" sideOffset={5}>
                 <DropdownMenu.Item className="text-sm px-3 py-2 text-gray-500 hover:bg-gray-100 rounded-md">
                   Profile
                 </DropdownMenu.Item>
@@ -127,8 +123,9 @@ export function DriverDashboard({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6">
+          {children}
+        </main>
       </div>
     </div>
   );

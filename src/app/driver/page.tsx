@@ -5,8 +5,13 @@ import { AppDispatch } from "@/hooks/reduxHooks";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { notFound } from "next/navigation";
-import { getOrders, changeOrderStatus,getDeliveredOrders } from "@/redux/actions/deliveryActions";
+import {
+  getOrders,
+  changeOrderStatus,
+  getDeliveredOrders,
+} from "@/redux/actions/deliveryActions";
 import { useToast } from "@/components/ToastProvider";
+import { useSearch } from "@/components/SearchContext";
 
 interface FoodOrder {
   orderId: string;
@@ -14,7 +19,6 @@ interface FoodOrder {
   status: "delivering" | "in transit" | "pending" | "completed" | "picked";
   amount: string;
   icon: string;
-
   actualDeliveryTime: string | null;
   createdAt: string;
   customerId: string;
@@ -42,8 +46,13 @@ interface FoodOrder {
 const DeliveryRiderPage = () => {
   const dispatch = AppDispatch();
   const { showToast } = useToast();
+  const { searchTerm } = useSearch();
 
   const [storedUser, setStoredUser] = useState<any | null>(null);
+  const [loadingStates, setLoadingStates] = useState<{
+    [key: string]: "picked" | "in_transit" | "delivered" | null;
+  }>({});
+
   useEffect(() => {
     const userString = localStorage.getItem("user");
 
@@ -64,31 +73,63 @@ const DeliveryRiderPage = () => {
     }
   }, [storedUser, dispatch]);
 
-  const deliveries = useSelector((state: RootState) => Array.isArray(state.delivery.orders) ? state.delivery.orders : []);
+  const deliveries = useSelector((state: RootState) =>
+    Array.isArray(state.delivery.orders) ? state.delivery.orders : []
+  );
 
+  const filteredDeliveries = deliveries.filter((delivery) =>
+    Object.values(delivery).some((value) =>
+      String(value).toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  );
 
   type OrderStatus = "picked" | "in_transit" | "delivered";
   const handleStatusUpdate = async (id: string, status: OrderStatus) => {
     try {
+      setLoadingStates((prev) => ({ ...prev, [id]: status }));
       await dispatch(changeOrderStatus(id, status));
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const statusMessages = {
         picked: `Order has been picked up`,
         in_transit: `Order is now in transit`,
-        delivered: `Order has been delivered`
+        delivered: `Order has been delivered`,
       };
-      
+
       showToast(
-        status.replace('_', ' ').toUpperCase(),  // "IN TRANSIT"
+        status.replace("_", " ").toUpperCase(),
         statusMessages[status],
         "success"
       );
     } catch (error) {
       console.error("Status update failed:", error);
     } finally {
+      setLoadingStates((prev) => ({ ...prev, [id]: null }));
       dispatch(getOrders(storedUser.id));
     }
   };
+
+  const Spinner = () => (
+    <svg
+      className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        className="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        strokeWidth="4"
+      ></circle>
+      <path
+        className="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+      ></path>
+    </svg>
+  );
 
   return (
     <div className="p-4">
@@ -98,7 +139,7 @@ const DeliveryRiderPage = () => {
         </h1>
         <p className="text-gray-600 mb-6">You are currently delivering...</p>
 
-        {deliveries?.length === 0 ? (
+        {filteredDeliveries?.length === 0 ? (
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4">
             <div className="flex">
               <div className="flex-shrink-0">
@@ -125,7 +166,7 @@ const DeliveryRiderPage = () => {
           </div>
         ) : (
           <div className="w-full space-y-4">
-            {deliveries?.map((order) => (
+            {filteredDeliveries?.map((order) => (
               <div
                 key={order._id}
                 className="w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm"
@@ -157,7 +198,7 @@ const DeliveryRiderPage = () => {
 
                 {/* Main Content */}
                 <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-                  {/* Customer Details Section - Now with all field titles */}
+                  {/* Customer Details Section */}
                   <div className="space-y-4">
                     <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
                       Customer Details
@@ -265,9 +306,10 @@ const DeliveryRiderPage = () => {
                       disabled={
                         order.status === "picked" ||
                         order.status === "in_transit" ||
-                        order.status === "delivered"
+                        order.status === "delivered" ||
+                        loadingStates[order._id] === "picked"
                       }
-                      className={`px-4 py-2 text-sm font-medium rounded-md min-w-[100px] ${
+                      className={`px-4 py-2 text-sm font-medium rounded-md min-w-[100px] flex items-center justify-center ${
                         order.status === "picked" ||
                         order.status === "in_transit" ||
                         order.status === "delivered"
@@ -275,37 +317,60 @@ const DeliveryRiderPage = () => {
                           : "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
                       }`}
                     >
-                      Picked
+                      {loadingStates[order._id] === "picked" ? (
+                        <>
+                          <Spinner />
+                          Processing...
+                        </>
+                      ) : (
+                        "Picked"
+                      )}
                     </button>
                     <button
                       onClick={() =>
-                        handleStatusUpdate(order?._id, "in_transit")
+                        handleStatusUpdate(order._id, "in_transit")
                       }
                       disabled={
-                        order?.status === "in_transit" ||
-                        order.status === "delivered"
+                        order.status === "in_transit" ||
+                        order.status === "delivered" ||
+                        loadingStates[order._id] === "in_transit"
                       }
-                      className={`px-4 py-2 text-sm font-medium rounded-md min-w-[100px] ${
+                      className={`px-4 py-2 text-sm font-medium rounded-md min-w-[100px] flex items-center justify-center ${
                         order.status === "in_transit" ||
                         order.status === "delivered"
                           ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                           : "bg-purple-100 text-purple-800 hover:bg-purple-200"
                       }`}
                     >
-                      In Transit
+                      {loadingStates[order._id] === "in_transit" ? (
+                        <>
+                          <Spinner />
+                          Processing...
+                        </>
+                      ) : (
+                        "In Transit"
+                      )}
                     </button>
                     <button
-                      onClick={() =>
-                        handleStatusUpdate(order?._id, "delivered")
+                      onClick={() => handleStatusUpdate(order._id, "delivered")}
+                      disabled={
+                        order.status === "delivered" ||
+                        loadingStates[order._id] === "delivered"
                       }
-                      disabled={order?.status === "delivered"}
-                      className={`px-4 py-2 text-sm font-medium rounded-md min-w-[100px] ${
+                      className={`px-4 py-2 text-sm font-medium rounded-md min-w-[100px] flex items-center justify-center ${
                         order.status === "delivered"
                           ? "bg-green-600 text-white shadow-inner"
                           : "bg-green-100 text-green-800 hover:bg-green-200"
                       }`}
                     >
-                      Delivered
+                      {loadingStates[order._id] === "delivered" ? (
+                        <>
+                          <Spinner />
+                          Processing...
+                        </>
+                      ) : (
+                        "Delivered"
+                      )}
                     </button>
                   </div>
                 </div>
