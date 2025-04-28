@@ -25,6 +25,7 @@ export interface FoodOrder {
 interface FoodOrdersState {
   orders: FoodOrder[];
   delivered: FoodOrder[];
+  ongoing: FoodOrder[]; 
   loading: boolean;
   error: string | null;
 }
@@ -32,6 +33,7 @@ interface FoodOrdersState {
 const initialState: FoodOrdersState = {
   orders: [],
   delivered: [],
+  ongoing: [],
   loading: false,
   error: null,
 };
@@ -76,15 +78,33 @@ const deliveriesSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
-    updateOrderStatus: (state, action: PayloadAction<{
-      orderId: string;
-      status: "picked" | "in_transit" | "delivered";
-    }>) => {
-      const order = state.orders.find(o => o.orderId === action.payload.orderId);
+    updateOrderStatus: (
+      state,
+      action: PayloadAction<{
+        orderId: string;
+        status: "picked" | "in_transit" | "delivered";
+      }>
+    ) => {
+      const order = state.orders.find(
+        (o) => o.orderId === action.payload.orderId
+      );
       if (order) {
         order.status = action.payload.status;
       }
-    }
+    },
+
+    getOngoingOrdersStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    getOngoingOrdersSuccess(state, action: PayloadAction<FoodOrder[]>) {
+      state.loading = false;
+      state.ongoing = action.payload;
+    },
+    getOngoingOrdersFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -97,11 +117,15 @@ export const {
   addOrderSuccess,
   getOrderFailure,
 
-  updateOrderStatus, 
+  updateOrderStatus,
 
   getDeliveriesDeliveredFailure,
   getDeliveriesDeliveredStart,
   getDeliveriesDeliveredSuccess,
+
+  getOngoingOrdersStart,
+  getOngoingOrdersSuccess,
+  getOngoingOrdersFailure,
 } = deliveriesSlice.actions;
 
 export default deliveriesSlice.reducer;

@@ -17,7 +17,7 @@ interface OrderItem {
 
 export interface Order {
   _id: string;
-  orderId: string,
+  orderId: string;
   customerId: string;
   restuarantId: string;
   items: OrderItem[];
@@ -59,17 +59,76 @@ const ordersSlice = createSlice({
       state.error = action.payload;
     },
     updateOrderStatus: (
-      state, 
+      state,
       action: PayloadAction<{ orderId: string; status: string }>
     ) => {
-      const order = state.orders.find(o => o.orderId === action.payload.orderId);
+      const order = state.orders.find(
+        (o) => o.orderId === action.payload.orderId
+      );
       if (order) {
         order.status = action.payload.status;
       }
-    }
+    },
+    fetchOrdersStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    fetchOrdersSuccess(state, action: PayloadAction<Order[]>) {
+      state.loading = false;
+      state.orders = action.payload;
+    },
+    fetchOrdersFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    // Create New Order
+    createOrderStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    createOrderSuccess(state, action: PayloadAction<Order>) {
+      state.loading = false;
+      state.orders.push(action.payload); // Add new order to existing list
+    },
+    createOrderFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
+    },
+
+    // Update Order Status
+    updateOrderStatusStart(state) {
+      state.loading = true;
+      state.error = null;
+    },
+    updateOrderStatusSuccess(state, action: PayloadAction<Order>) {
+      state.loading = false;
+      const updatedOrder = action.payload;
+      const index = state.orders.findIndex((o) => o._id === updatedOrder._id);
+      if (index !== -1) {
+        state.orders[index] = updatedOrder;
+      }
+    },
+    updateOrderStatusFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
+    },
   },
 });
 
-export const { getOrderStart, getOrderSuccess, getOrderFailure } = ordersSlice.actions;
+export const {
+  getOrderStart,
+  getOrderSuccess,
+  getOrderFailure,
+  fetchOrdersStart,
+  fetchOrdersSuccess,
+  fetchOrdersFailure,
+  createOrderStart,
+  createOrderSuccess,
+  createOrderFailure,
+  updateOrderStatusStart,
+  updateOrderStatusSuccess,
+  updateOrderStatusFailure,
+} = ordersSlice.actions;
 
 export default ordersSlice.reducer;

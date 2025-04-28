@@ -9,7 +9,10 @@ import {
   updateOrderStatus,
   getDeliveriesDeliveredFailure,
   getDeliveriesDeliveredStart,
-  getDeliveriesDeliveredSuccess
+  getDeliveriesDeliveredSuccess,
+  getOngoingOrdersStart,
+  getOngoingOrdersSuccess,
+  getOngoingOrdersFailure,
   
 } from "../slices/deliverySlice";
 import { deliveryApi } from "@/lib/api";
@@ -17,7 +20,8 @@ import {
   GET_DELIVERIES,
   ADD_ORDER_ENDPOINT,
   UPDATE_ORDER_STATUS_ENDPOINT,
-  GET_DELIVERIES_DELIVERED
+  GET_DELIVERIES_DELIVERED,
+  GET_USER_ONGOING
 } from "@/config/apiConfig";
 
 export const getOrders = (id: string) => async (dispatch: AppDispatch) => {
@@ -30,6 +34,21 @@ export const getOrders = (id: string) => async (dispatch: AppDispatch) => {
   } catch (err: any) {
     dispatch(
       getDeliveriesFailure(
+        err?.response?.data?.message || "Failed to fetch deliveries"
+      )
+    );
+  }
+};
+export const getUserOrders = (id: string) => async (dispatch: AppDispatch) => {
+  dispatch(getOngoingOrdersStart());
+  try {
+    const res = await deliveryApi.get(GET_USER_ONGOING(id), {
+      withCredentials: true,
+    });
+    dispatch(getOngoingOrdersSuccess(res.data));
+  } catch (err: any) {
+    dispatch(
+      getOngoingOrdersFailure(
         err?.response?.data?.message || "Failed to fetch deliveries"
       )
     );

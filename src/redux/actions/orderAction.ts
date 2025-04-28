@@ -2,7 +2,16 @@ import { AppDispatch } from "../store";
 import {
   getOrderStart,
   getOrderSuccess,
-  getOrderFailure
+  getOrderFailure,
+  fetchOrdersStart,
+  fetchOrdersSuccess,
+  fetchOrdersFailure,
+  createOrderStart,
+  createOrderSuccess,
+  createOrderFailure,
+  updateOrderStatusStart,
+  updateOrderStatusSuccess,
+  updateOrderStatusFailure,
 } from "../slices/orderSlice";
 import { orderApi } from "@/lib/api";
 import { GET_OFD_ORDERS,UPDATE_OFD_ORDERS } from "@/config/apiConfig";
@@ -43,3 +52,39 @@ export const changeOrderStatus =
     }
   };
 
+  export const createOrder = (customerId: string, orderData: any) => async (dispatch: AppDispatch) => {
+    dispatch(createOrderStart());
+    try {
+      const res = await orderApi.post(`/cart/${customerId}/checkout`, orderData);
+      dispatch(createOrderSuccess(res.data));
+    } catch (err: any) {
+      dispatch(
+        createOrderFailure(err?.response?.data?.message || "Failed to create order")
+      );
+    }
+  };
+
+  export const fetchOrders = () => async (dispatch: AppDispatch) => {
+    dispatch(fetchOrdersStart());
+    try {
+      const res = await orderApi.get(`/orders/customer/6803430128070e0251d7e0ea/orders`);
+      dispatch(fetchOrdersSuccess(res.data));
+    } catch (err: any) {
+      dispatch(
+        fetchOrdersFailure(err?.response?.data?.message || "Failed to fetch orders")
+      );
+    }
+  };
+  
+  // Update order status (preparing / packing / out for delivery etc.)
+export const updateOrderStatus = (orderId: string, status: string) => async (dispatch: AppDispatch) => {
+  dispatch(updateOrderStatusStart());
+  try {
+    const res = await orderApi.put(`/order/${orderId}/status`, { status });
+    dispatch(updateOrderStatusSuccess(res.data));
+  } catch (err: any) {
+    dispatch(
+      updateOrderStatusFailure(err?.response?.data?.message || "Failed to update order status")
+    );
+  }
+};
