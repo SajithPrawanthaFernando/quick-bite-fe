@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '@/redux/store';
-import { createOrder } from '@/redux/actions/orderAction';
-import { useRouter } from 'next/navigation';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/redux/store";
+import { createOrder } from "@/redux/actions/orderAction";
+import { useRouter } from "next/navigation";
+import { PaymentModal } from "@/components/modals/PaymentModal";
 //import { restaurantApi } from '@/lib/api'; // Import Restaurant API
 
 const DELIVERY_FEE = 150;
@@ -16,16 +17,20 @@ export default function CheckoutPage() {
 
   const [restaurant, setRestaurant] = useState<any>(null);
 
-  const [houseNumber, setHouseNumber] = useState('');
-  const [lane1, setLane1] = useState('');
-  const [lane2, setLane2] = useState('');
-  const [city, setCity] = useState('');
-  const [district, setDistrict] = useState('');
+  const [houseNumber, setHouseNumber] = useState("");
+  const [lane1, setLane1] = useState("");
+  const [lane2, setLane2] = useState("");
+  const [city, setCity] = useState("");
+  const [district, setDistrict] = useState("");
   const [total, setTotal] = useState(0);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (cart.length > 0) {
-      const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const subtotal = cart.reduce(
+        (sum, item) => sum + item.price * item.quantity,
+        0
+      );
       setTotal(subtotal + DELIVERY_FEE);
 
       // const fetchRestaurant = async () => {
@@ -41,39 +46,17 @@ export default function CheckoutPage() {
     }
   }, [cart]);
 
-  const placeOrder = async () => {
-    if (!houseNumber.trim() || !lane1.trim() || !city.trim() || !district.trim()) {
-      alert('Please fill all required delivery address fields!');
+  const handleCheckout = () => {
+    if (
+      !houseNumber.trim() ||
+      !lane1.trim() ||
+      !city.trim() ||
+      !district.trim()
+    ) {
+      alert("Please fill all required delivery address fields!");
       return;
     }
-
-    const deliveryAddress = {
-      houseNumber,
-      lane1,
-      lane2,
-      city,
-      district,
-    };
-
-    const orderData = {
-      items: cart.map((item) => ({
-        itemId: item.itemId,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-      })),
-      deliveryAddress,
-      deliveryFee: DELIVERY_FEE,
-      totalAmount: total,
-    };
-
-    try {
-      await dispatch(createOrder('c123', orderData)); // Later replace 'c123' dynamically
-      alert('Order placed successfully!');
-      router.push('/success'); // Redirect to success page
-    } catch (err) {
-      alert('Failed to place order!');
-    }
+    setOpen(true); // JUST open modal
   };
 
   return (
@@ -91,7 +74,9 @@ export default function CheckoutPage() {
       <div className="grid md:grid-cols-2 gap-8">
         {/* Delivery Address Section */}
         <div className="bg-white border border-yellow-300/50 rounded-xl p-6">
-          <h2 className="text-lg font-semibold text-black mb-4">Delivery Address</h2>
+          <h2 className="text-lg font-semibold text-black mb-4">
+            Delivery Address
+          </h2>
 
           <input
             type="text"
@@ -139,7 +124,9 @@ export default function CheckoutPage() {
           <ul className="mb-4 text-sm">
             {cart.map((item) => (
               <li key={item.itemId} className="flex justify-between py-1">
-                <span>{item.name} × {item.quantity}</span>
+                <span>
+                  {item.name} × {item.quantity}
+                </span>
                 <span>Rs.{item.price * item.quantity}</span>
               </li>
             ))}
@@ -156,13 +143,20 @@ export default function CheckoutPage() {
           </div>
 
           <button
-            onClick={placeOrder}
+            onClick={handleCheckout}
             className="mt-6 w-full bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2.5 rounded-full text-sm transition"
           >
             Place Order
           </button>
         </div>
       </div>
+      <PaymentModal
+        open={open}
+        onOpenChange={setOpen}
+        deliveryAddress={{ houseNumber, lane1, lane2, city, district }}
+        total={total}
+        cart={cart}
+      />
     </div>
   );
 }

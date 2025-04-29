@@ -1,15 +1,15 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState, AppDispatch } from '@/redux/store';
+"use client";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState, AppDispatch } from "@/redux/store";
 import {
   fetchCart,
   updateCartItemQuantity,
   removeCartItem,
   clearCart,
-} from '@/redux/actions/cartActions';
-import { useRouter } from 'next/navigation';
-import { Trash2, Plus, Minus } from 'lucide-react';
+} from "@/redux/actions/cartActions";
+import { useRouter } from "next/navigation";
+import { Trash2, Plus, Minus } from "lucide-react";
 //import { restaurantApi } from '@/lib/api'; // Import restaurant API
 
 const DELIVERY_FEE = 150;
@@ -37,7 +37,6 @@ export default function CartPage() {
     //     }
     //   }
     // };
-
     // fetchRestaurant();
   }, [cart]);
 
@@ -60,7 +59,7 @@ export default function CartPage() {
   };
 
   const goToCheckout = () => {
-    router.push('/checkout');
+    router.push("/checkout");
   };
 
   const calculateSubtotal = () => {
@@ -72,7 +71,9 @@ export default function CartPage() {
 
   return (
     <div className="max-w-7xl mx-auto p-6 pt-24">
-      <h1 className="text-2xl font-bold text-black mb-6 text-center">Your Cart</h1>
+      <h1 className="text-2xl font-bold text-black mb-6 text-center">
+        Your Cart
+      </h1>
 
       {/* Restaurant Info */}
       {restaurant && (
@@ -94,25 +95,33 @@ export default function CartPage() {
           <div className="md:col-span-2">
             <div className="bg-white border border-yellow-300/50 rounded-xl p-6">
               {cart.map((item) => (
-                <div key={item.itemId} className="flex items-center justify-between py-4 border-b last:border-b-0">
+                <div
+                  key={item.itemId}
+                  className="flex items-center justify-between py-4 border-b last:border-b-0"
+                >
                   <div>
                     <h2 className="font-semibold text-black">{item.name}</h2>
                     <p className="text-gray-600 text-sm">
-                      Rs.{item.price} × {item.quantity} = <b>Rs.{item.price * item.quantity}</b>
+                      Rs.{item.price} × {item.quantity} ={" "}
+                      <b>Rs.{item.price * item.quantity}</b>
                     </p>
                   </div>
 
                   <div className="flex items-center space-x-2">
                     <div className="flex items-center border rounded-full px-2">
                       <button
-                        onClick={() => decreaseQuantity(item.itemId, item.quantity)}
+                        onClick={() =>
+                          decreaseQuantity(item.itemId, item.quantity)
+                        }
                         className="p-1 text-black"
                       >
                         <Minus size={16} />
                       </button>
                       <span className="px-2">{item.quantity}</span>
                       <button
-                        onClick={() => increaseQuantity(item.itemId, item.quantity)}
+                        onClick={() =>
+                          increaseQuantity(item.itemId, item.quantity)
+                        }
                         className="p-1 text-black"
                       >
                         <Plus size={16} />

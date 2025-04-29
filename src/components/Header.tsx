@@ -11,8 +11,9 @@ import { MenuDrawer } from "./MenuDrawer";
 import { LoginModal } from "./modals/LoginModal";
 import { SignupModal } from "./modals/SignupModal";
 import { UserProfileModal } from "./modals/UserProfileModal";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/redux/store";
+import { fetchCart } from "@/redux/actions/cartActions";
 
 export const Header = () => {
   const [isVisible, setIsVisible] = useState(true);
@@ -20,6 +21,12 @@ export const Header = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isSignupOpen, setIsSignupOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const { cart, loading } = useSelector((state: RootState) => state.cart);
+
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
 
   const user1 = useSelector((state: RootState) => state.auth.isAuthenticated);
   const user = {
@@ -95,9 +102,16 @@ export const Header = () => {
       {/* Right Section */}
       <div className={`flex items-center ${user ? "gap-7" : "gap-10"}`}>
         <div className="relative">
-          <ShoppingCart className="text-black w-5 h-5" />
+          <Link href="/cart">
+            <ShoppingCart className="text-black w-5 h-5" />
+          </Link>
+
           <span className="absolute -top-2 -right-2 bg-[#FDB940] text-white text-xs rounded-full px-1.5 py-0.5">
-            0
+            {loading ? (
+              <div className="w-2 h-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            ) : (
+              cart.length
+            )}
           </span>
         </div>
 

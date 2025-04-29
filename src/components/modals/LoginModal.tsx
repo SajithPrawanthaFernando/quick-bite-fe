@@ -63,7 +63,7 @@ export const LoginModal = ({
 
       if (loggedInUser?.roles?.includes("admin")) {
         router.push("/admin");
-      } else if(user?.roles?.includes("driver")){
+      } else if (user?.roles?.includes("driver")) {
         router.push("/driver");
       } else {
         router.push("/");

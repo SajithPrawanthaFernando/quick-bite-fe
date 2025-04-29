@@ -4,16 +4,30 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
+import { AppDispatch } from "@/redux/store";
+import { createOrder } from "@/redux/actions/orderAction";
+import { fetchCart } from "@/redux/actions/cartActions";
 
 export const PaymentModal = ({
   open,
   onOpenChange,
   trigger,
+  deliveryAddress,
+  total,
+  cart,
 }: {
   open: boolean;
   onOpenChange: (value: boolean) => void;
   trigger?: React.ReactNode;
+  deliveryAddress: any;
+  total: number;
+  cart: any[];
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -21,10 +35,42 @@ export const PaymentModal = ({
     reset,
   } = useForm();
 
-  const onSubmit = (data: any) => {
-    console.log("Payment Data:", data);
-    onOpenChange(false);
-    reset();
+  const onSubmit = async (paymentData: any) => {
+    const [expMonth, expYearShort] = paymentData.expiry.split("/");
+    const expMonthNum = Number(expMonth);
+    const expYearNum = Number("20" + expYearShort); // Assuming input is MM/YY
+
+    const body = {
+      deliveryAddress,
+      charge: {
+        amount: total,
+        card: {
+          cvc: paymentData.cvv,
+          exp_month: expMonthNum,
+          exp_year: expYearNum,
+          number: paymentData.cardNumber.replace(/\s+/g, ""), // remove spaces
+        },
+      },
+      items: cart.map((item) => ({
+        itemId: item.itemId,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+    };
+
+    try {
+      await dispatch(createOrder("680ca51fa95a4a19afc4bd0d", body));
+      console.log("Order Placed Successfully", body);
+      dispatch(fetchCart());
+      router.push("/myOrders");
+    } catch (err) {
+      console.error(err);
+      alert("Failed to place order!");
+    } finally {
+      onOpenChange(false);
+      reset();
+    }
   };
 
   useEffect(() => {
@@ -35,15 +81,13 @@ export const PaymentModal = ({
 
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
-      <Dialog.Trigger asChild>
-        {trigger ? trigger : <button>Make Payment</button>}
-      </Dialog.Trigger>
+      {trigger && <Dialog.Trigger asChild>{trigger}</Dialog.Trigger>}
 
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black/50 z-40" />
         <Dialog.Content
-          className={`fixed top-1/2 left-1/2 z-100 w-[90%] max-w-md transform -translate-x-1/2 -translate-y-1/2 
-            bg-white p-6 rounded-lg shadow-xl modal-animation`}
+          className="fixed top-1/2 left-1/2 z-100 w-[90%] max-w-md transform -translate-x-1/2 -translate-y-1/2 
+            bg-white p-6 rounded-lg shadow-xl modal-animation"
         >
           <Dialog.Title className="text-xl font-semibold text-black mb-4">
             Payment Details
@@ -101,7 +145,7 @@ export const PaymentModal = ({
               </label>
               <input
                 {...register("cardNumber", { required: true })}
-                maxLength={16}
+                maxLength={19} // to allow spaces
                 inputMode="numeric"
                 className={`mt-1 border rounded-md text-black px-3 py-2 focus:outline-none focus:ring focus:ring-[#FDB940] ${
                   errors.cardNumber ? "border-red-500" : "border-gray-300"
