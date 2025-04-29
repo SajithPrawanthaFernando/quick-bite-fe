@@ -52,8 +52,8 @@ export const adminService = {
   getAllRestaurants: async (status?: 'pending' | 'approved' | 'rejected') => {
     try {
       const url = status 
-        ? `/admin/restaurants?status=${status}`
-        : '/admin/restaurants';
+        ? `/restaurants?status=${status}`
+        : '/restaurants';
       
       const result = await apiService.get<{ data: Restaurant[]; meta: any }>(url);
       console.log('Fetched restaurants:', result);
@@ -82,7 +82,7 @@ export const adminService = {
   // Get rejected restaurants
   getRejectedRestaurants: async () => {
     try {
-      const result = await apiService.get<{ data: Restaurant[]; meta: any }>('/admin/restaurants?status=rejected');
+      const result = await apiService.get<{ data: Restaurant[]; meta: any }>('/restaurants?status=rejected');
       return result.data || [];
     } catch (error) {
       console.error('Error fetching rejected restaurants:', error);
