@@ -56,8 +56,6 @@ export const UserProfileModal = ({
   const users = useSelector((state: RootState) => state.user.users);
   const user = users[0];
 
-  console.log("User", user);
-
   useEffect(() => {
     if (user) {
       setValue("fullname", user.fullname || "");

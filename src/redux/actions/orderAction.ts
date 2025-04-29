@@ -73,7 +73,7 @@ export const fetchOrders = () => async (dispatch: AppDispatch) => {
   dispatch(fetchOrdersStart());
   try {
     const res = await orderApi.get(
-      `/orders/customer/680ca51fa95a4a19afc4bd0d/orders`
+      `/orders/customer/68066c8264815a54ee147a5d/orders`
     );
     console.log(res);
     dispatch(fetchOrdersSuccess(res.data));

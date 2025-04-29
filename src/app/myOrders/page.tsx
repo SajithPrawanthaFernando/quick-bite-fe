@@ -30,7 +30,6 @@ export default function OrdersPage() {
         dispatch(fetchRestaurants());
 
         // clear interval when component unmounts
-        return () => clearInterval(interval);
       } catch (error) {
         console.error("Error parsing user from localStorage", error);
         showToast("Error loading user data", "error");
@@ -38,12 +37,18 @@ export default function OrdersPage() {
     }
   }, [dispatch, showToast]);
 
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, []);
+
   const orders = useSelector((state: RootState) => state.orders.orders);
   const userOrders = useSelector((state: RootState) => state.delivery.ongoing);
   const users = useSelector((state: RootState) => state.user.users);
   const restaurants = useSelector(
     (state: RootState) => state.restaurants.restaurants
   );
+
+  console.log(orders);
 
   const ordersWithDetails = orders.map((order) => {
     const customer = users.find((user) => user._id === order.customerId);

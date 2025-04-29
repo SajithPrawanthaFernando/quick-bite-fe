@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { AppDispatch } from "@/redux/store";
-import { createOrder } from "@/redux/actions/orderAction";
+import { createOrder, fetchOrders } from "@/redux/actions/orderAction";
 import { fetchCart } from "@/redux/actions/cartActions";
 
 export const PaymentModal = ({
@@ -63,6 +63,7 @@ export const PaymentModal = ({
       await dispatch(createOrder("680ca51fa95a4a19afc4bd0d", body));
       console.log("Order Placed Successfully", body);
       dispatch(fetchCart());
+      dispatch(fetchOrders());
       router.push("/myOrders");
     } catch (err) {
       console.error(err);
