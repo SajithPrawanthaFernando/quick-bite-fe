@@ -109,7 +109,7 @@ export default function AdminRestaurantsPage() {
     if (statusFilter === 'all') return true;
     if (statusFilter === 'pending') return !restaurant.isApproved && restaurant.isActive;
     if (statusFilter === 'approved') return restaurant.isApproved && restaurant.isActive;
-    if (statusFilter === 'rejected') return !restaurant.isActive;
+    if (statusFilter === 'rejected') return !restaurant.isApproved && !restaurant.isActive;
     return true;
   });
 
