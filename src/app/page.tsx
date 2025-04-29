@@ -4,9 +4,17 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { customerService } from "@/redux/services/customer.service";
 import { Restaurant } from "@/types/restaurant";
+import * as Select from "@radix-ui/react-select";
+import { ChevronDown, Check } from "lucide-react";
 import Image from "next/image";
+
 import { Header } from "@/components";
 import { PromoSection } from "@/components/promo-card/promo-section";
+import { LoginModal } from "@/components/modals/LoginModal";
+import { AppDispatch } from "@/hooks/reduxHooks";
+import { getUsers } from "@/redux/actions/usersActions";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 interface Category {
   name: string;
   image: string;
@@ -24,6 +32,22 @@ export default function Home() {
   const [sortOption, setSortOption] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState("");
   const [ratingRange, setRatingRange] = useState<string>("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const dispatch = AppDispatch();
+
+  const isAuthenticated = useSelector(
+    (state: RootState) => state.auth.isAuthenticated
+  );
+
+  useEffect(() => {
+    setIsLoggedIn(isAuthenticated);
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    dispatch(getUsers());
+  }, []);
+
   useEffect(() => {
     const fetchRestaurants = async () => {
       try {
@@ -45,9 +69,15 @@ export default function Home() {
   const handleSearch = () => {
     setSearchQuery(searchTerm);
   };
+
   const handleViewMenu = (restaurantId: string) => {
+    if (!isLoggedIn) {
+      setLoginModalOpen(true);
+      return;
+    }
     router.push(`/restaurants/${restaurantId}/menu`);
   };
+
   const getRandomRating = () => {
     return (Math.random() * 2 + 3).toFixed(1);
   };
@@ -197,12 +227,12 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-white pt-[80px]">
+    <div className="min-h-screen px-40 bg-white pt-[80px]">
       {/* Header */}
 
       {/* Categories */}
-      <div className="bg-white py-4 px-10">
-        <div className="flex overflow-x-auto px-6 gap-4">
+      <div className="bg-white py-4 text-[12px] text-black/70">
+        <div className="flex overflow-x-auto  gap-4">
           {categories.map((category) => (
             <div
               key={category.name}
@@ -222,63 +252,127 @@ export default function Home() {
         </div>
       </div>
       {/* Filters Dropdowns */}
-      <div className="bg-white py-4 flex gap-4 items-center flex-nowrap px-20">
-        <select
-          value={priceRange}
-          onChange={(e) => setPriceRange(e.target.value)}
-          className="bg-gray-200 rounded-full px-4 py-2 text-sm"
-        >
-          <option value="">Price Range</option>
-          <option value="low">Low (≤ $200)</option>
-          <option value="medium">Medium ($200 - $500)</option>
-          <option value="high">High ($500)</option>
-        </select>
+      <div className="bg-white py-4 flex gap-4 text-black/70 items-center flex-nowrap">
+        {/* Price Range */}
+        <Select.Root value={priceRange} onValueChange={setPriceRange}>
+          <Select.Trigger className="bg-gray-200 rounded-full px-4 py-2 text-sm flex items-center justify-between min-w-[150px]">
+            <Select.Value placeholder="Price Range" />
+            <Select.Icon className="ml-2">
+              <ChevronDown size={16} />
+            </Select.Icon>
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Content className="bg-white rounded shadow border">
+              <Select.Viewport className="p-1">
+                <Select.Item value="low">
+                  <Select.ItemText>Low (≤ $200)</Select.ItemText>
+                </Select.Item>
+                <Select.Item value="medium">
+                  <Select.ItemText>Medium ($200 - $500)</Select.ItemText>
+                </Select.Item>
+                <Select.Item value="high">
+                  <Select.ItemText>High (&gt; $500)</Select.ItemText>
+                </Select.Item>
+              </Select.Viewport>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
 
-        <select
+        {/* Delivery Fee */}
+        <Select.Root
           value={deliveryFeeRange}
-          onChange={(e) => setDeliveryFeeRange(e.target.value)}
-          className="bg-gray-200 rounded-full px-4 py-2 text-sm"
+          onValueChange={setDeliveryFeeRange}
         >
-          <option value="">Delivery Fee</option>
-          <option value="under50">Under ₹50</option>
-          <option value="under100">Under ₹100</option>
-          <option value="under200">Under ₹200</option>
-        </select>
+          <Select.Trigger className="bg-gray-200 rounded-full px-4 py-2 text-sm flex items-center justify-between min-w-[150px]">
+            <Select.Value placeholder="Delivery Fee" />
+            <Select.Icon>
+              <ChevronDown size={16} />
+            </Select.Icon>
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Content className="bg-white rounded shadow border">
+              <Select.Viewport className="p-1">
+                <Select.Item value="under50">
+                  <Select.ItemText>Under ₹50</Select.ItemText>
+                </Select.Item>
+                <Select.Item value="under100">
+                  <Select.ItemText>Under ₹100</Select.ItemText>
+                </Select.Item>
+                <Select.Item value="under200">
+                  <Select.ItemText>Under ₹200</Select.ItemText>
+                </Select.Item>
+              </Select.Viewport>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
 
-        <select
-          value={ratingRange}
-          onChange={(e) => setRatingRange(e.target.value)}
-          className="bg-gray-200 rounded-full px-4 py-2  text-sm"
-        >
-          <option value="">Rating Range</option>
-          <option value="1-2">1-2</option>
-          <option value="2-3">2-3</option>
-          <option value="3-4">3-4</option>
-          <option value="4-5">4-5</option>
-        </select>
-        <select
-          value={sortOption}
-          onChange={(e) => setSortOption(e.target.value)}
-          className="bg-gray-200 rounded-full px-4 py-2 text-sm"
-        >
-          <option value="">Sort</option>
-          <option value="rating">Rating High to Low</option>
-          <option value="deliveryFeeLowToHigh">Delivery Fee Low to High</option>
-          <option value="under30min">Delivery under 30 min</option>
-        </select>
+        {/* Rating Range */}
+        <Select.Root value={ratingRange} onValueChange={setRatingRange}>
+          <Select.Trigger className="bg-gray-200 rounded-full px-4 py-2 text-sm flex items-center justify-between min-w-[150px]">
+            <Select.Value placeholder="Rating Range" />
+            <Select.Icon>
+              <ChevronDown size={16} />
+            </Select.Icon>
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Content className="bg-white rounded shadow border">
+              <Select.Viewport className="p-1">
+                <Select.Item value="1-2">
+                  <Select.ItemText>1 - 2</Select.ItemText>
+                </Select.Item>
+                <Select.Item value="2-3">
+                  <Select.ItemText>2 - 3</Select.ItemText>
+                </Select.Item>
+                <Select.Item value="3-4">
+                  <Select.ItemText>3 - 4</Select.ItemText>
+                </Select.Item>
+                <Select.Item value="4-5">
+                  <Select.ItemText>4 - 5</Select.ItemText>
+                </Select.Item>
+              </Select.Viewport>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
+
+        {/* Sort Option */}
+        <Select.Root value={sortOption} onValueChange={setSortOption}>
+          <Select.Trigger className="bg-gray-200 rounded-full px-4 py-2 text-sm flex items-center justify-between min-w-[180px]">
+            <Select.Value placeholder="Sort" />
+            <Select.Icon>
+              <ChevronDown size={16} />
+            </Select.Icon>
+          </Select.Trigger>
+          <Select.Portal>
+            <Select.Content className="bg-white rounded shadow border">
+              <Select.Viewport className="p-1">
+                <Select.Item value="rating">
+                  <Select.ItemText>Rating High to Low</Select.ItemText>
+                </Select.Item>
+                <Select.Item value="deliveryFeeLowToHigh">
+                  <Select.ItemText>Delivery Fee Low to High</Select.ItemText>
+                </Select.Item>
+                <Select.Item value="under30min">
+                  <Select.ItemText>Delivery under 30 min</Select.ItemText>
+                </Select.Item>
+              </Select.Viewport>
+            </Select.Content>
+          </Select.Portal>
+        </Select.Root>
       </div>
 
       <PromoSection />
 
-      <div className="px-10 pt-6 pb-2 flex justify-between items-center">
-        <h2 className="text-2xl font-bold px-10">
+      <div className=" pt-6 pb-2 flex justify-between items-center">
+        <h2 className="text-2xl font-bold text-black mb-3">
           Most loved deals on QuickBite
         </h2>
-        <button className="text-sm font-medium pr-14">See all</button>
+        <button className="text-sm font-medium pr-3 text-black/70">
+          See all
+        </button>
       </div>
       {/* Restaurants */}
 
-      <div className="max-w-screen-xl bg-white mx-auto px-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-x-2 gap-y-6">
+      <div className="max-w-screen-xl bg-white mx-auto text-black/70  grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-x-2 gap-y-6">
         {sortedRestaurants.map((restaurant) => (
           <div
             key={restaurant._id}
@@ -307,6 +401,7 @@ export default function Home() {
           </div>
         ))}
       </div>
+      <LoginModal open={loginModalOpen} onOpenChange={setLoginModalOpen} />
     </div>
   );
 }

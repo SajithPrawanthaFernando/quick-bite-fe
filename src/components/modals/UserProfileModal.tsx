@@ -14,6 +14,7 @@ import { AppDispatch } from "@/hooks/reduxHooks";
 import { RootState } from "@/redux/store";
 import { logoutUser } from "@/redux/actions/authActions";
 import { useToast } from "../ToastProvider";
+import { useRouter } from "next/navigation";
 
 export const UserProfileModal = ({
   open,
@@ -27,6 +28,7 @@ export const UserProfileModal = ({
   const avatar = "/images/user.jpg";
   const dispatch = AppDispatch();
   const [editMode, setEditMode] = useState(false);
+  const router = useRouter();
 
   const schema = yup.object().shape({
     fullname: yup.string().required("Full name is required"),
@@ -75,6 +77,7 @@ export const UserProfileModal = ({
     await dispatch(logoutUser());
     onOpenChange(false);
     showToast("Logged out", "You have been successfully logged out.");
+    router.push("/");
   };
 
   return (

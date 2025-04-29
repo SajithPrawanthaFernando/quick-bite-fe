@@ -14,6 +14,7 @@ import { redirect, usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { useRouter } from "next/navigation";
+import { getUsers } from "@/redux/actions/usersActions";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -63,11 +64,12 @@ export const LoginModal = ({
 
       if (loggedInUser?.roles?.includes("admin")) {
         router.push("/admin");
-      } else if (user?.roles?.includes("driver")) {
+      } else if (loggedInUser?.roles?.includes("driver")) {
         router.push("/driver");
       } else {
         router.push("/");
       }
+      dispatch(getUsers());
     } catch (error: any) {
       showToast("Failed", error.message || "Login failed", "error");
     }

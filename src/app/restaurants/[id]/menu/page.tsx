@@ -16,6 +16,7 @@ import { HandThumbUpIcon as SolidThumbUpIcon } from "@heroicons/react/24/solid";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/redux/store";
 import { addToCart } from "@/redux/actions/cartActions";
+import { useToast } from "@/components/ToastProvider";
 
 export default function MenuPage() {
   const params = useParams();
@@ -94,6 +95,7 @@ export default function MenuPage() {
   useEffect(() => {
     fetchRestaurantAndMenu();
   }, [restaurantId]);
+  const { showToast } = useToast();
 
   const fetchRestaurantAndMenu = async () => {
     try {
@@ -138,6 +140,7 @@ export default function MenuPage() {
       specialInstructions,
     };
     dispatch(addToCart(cartItem));
+    showToast("Success", "Item added successfully!");
   };
 
   if (error || !restaurant) {
@@ -240,7 +243,7 @@ export default function MenuPage() {
         </div>
       </main>
 
-      <div className="flex items-center justify-center space-x-4 px-[170px]">
+      <div className="flex items-center justify-center space-x-4 px-[250px]">
         {/* Fixed Opening Hours Box */}
         <div className="w-auto max-w-[220px] p-3 rounded-lg border border-gray-200 shadow-sm bg-white z-20">
           {/* Opening Hours */}
@@ -269,7 +272,7 @@ export default function MenuPage() {
             <input
               type="text"
               placeholder="Search in menu"
-              className="w-[500px] pl-10 pr-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-200"
+              className="w-[500px] pl-10 pr-4 py-2 border text-black/70 border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-gray-200"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -278,7 +281,7 @@ export default function MenuPage() {
       </div>
 
       {/* Menu Section */}
-      <div className="max-w-screen-lg mx-auto rounded-lg   lg py-4 mb-5 mt-6">
+      <div className="max-w-screen-lg mx-auto rounded-lg   lg py-4  mt-6">
         <h2 className="text-xl font-bold text-gray-900 mb-4">Featured items</h2>
         {/* Featured Items */}
 
@@ -287,53 +290,53 @@ export default function MenuPage() {
             <p className="text-gray-500">No menu items available</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 ml-[-15px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-7 ml-[-15px]">
             {filteredMenuItems.map((item) => (
               <div
                 key={item._id}
-                className="relative flex flex-col items-start p-4 "
+                className="bg-white rounded-xl shadow-sm p-3 hover:shadow-md transition-all flex flex-col items-start relative group w-[200px]"
               >
-                <div className="relative w-[170px] h-[188px] mb-3">
-                  {item.image && (
-                    <img
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.name}
-                      className="rounded-lg object-cover w-full h-full"
-                    />
-                  )}
+                {/* Image Section */}
+                <div className="relative w-full h-[188px] rounded-lg overflow-hidden mb-3">
+                  <img
+                    src={item.image || "/placeholder.svg"}
+                    alt={item.name}
+                    className="object-cover w-full h-full rounded-lg transition-transform duration-300 group-hover:scale-105"
+                  />
 
-                  <div className="absolute bottom-2 right-4">
-                    <button
-                      className="bg-white text-black font-bold text-xl p-3 w-10 h-10 rounded-full shadow-md hover:bg-gray-100 transition flex items-center justify-center"
-                      onClick={() => {
-                        handleAddToCart(item, 1, "");
-                      }}
-                    >
-                      +
-                    </button>
-                  </div>
+                  <button
+                    className="absolute bottom-2 right-2 bg-white text-black font-bold text-xl w-10 h-10 rounded-full shadow-md hover:bg-gray-100 transition flex items-center justify-center"
+                    onClick={() => handleAddToCart(item, 1, "")}
+                  >
+                    +
+                  </button>
                 </div>
-                <div className="text-center">
-                  <h3 className="text-sm font-semibold text-gray-900">
+
+                {/* Name & Price */}
+                <div className="w-full flex items-center justify-between mb-1">
+                  <h3 className="text-sm font-semibold text-gray-900 line-clamp-1 w-[110px]">
                     {item.name}
                   </h3>
-                  <span className="text-lg font-bold text-gray-900">
+                  <span className="text-base font-bold text-gray-900">
                     ${Number(item.price).toFixed(2)}
                   </span>
                 </div>
-                <button
-                  onClick={handleClick}
-                  className="flex items-center space-x-2"
-                >
-                  {/* Toggle between solid and outline thumbs-up icon */}
-                  {liked ? (
-                    <SolidThumbUpIcon className="h-6 w-6 text-blue-500" />
-                  ) : (
-                    <OutlineThumbUpIcon className="h-6 w-6 text-gray-500" />
-                  )}
-                  <span>({count})</span>
-                </button>
-                <div className="text-center mt-2">
+
+                {/* Like Button */}
+                <div className="w-full flex items-center justify-between">
+                  <button
+                    onClick={handleClick}
+                    className="flex items-center space-x-1 text-sm"
+                  >
+                    {liked ? (
+                      <SolidThumbUpIcon className="h-4 w-4 text-blue-500" />
+                    ) : (
+                      <OutlineThumbUpIcon className="h-4 w-4 text-gray-500" />
+                    )}
+                    <span className="text-gray-600">({count})</span>
+                  </button>
+
+                  {/* Availability */}
                   <AvailabilityBadge available={item.isAvailable} />
                 </div>
               </div>

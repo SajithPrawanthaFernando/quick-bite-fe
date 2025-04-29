@@ -2,13 +2,14 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { X } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { AppDispatch } from "@/redux/store";
 import { createOrder, fetchOrders } from "@/redux/actions/orderAction";
 import { fetchCart } from "@/redux/actions/cartActions";
+import { useToast } from "../ToastProvider";
 
 export const PaymentModal = ({
   open,
@@ -27,6 +28,8 @@ export const PaymentModal = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const [apiError, setApiError] = useState("");
+  const { showToast } = useToast();
 
   const {
     register,
@@ -36,9 +39,10 @@ export const PaymentModal = ({
   } = useForm();
 
   const onSubmit = async (paymentData: any) => {
+    setApiError("");
     const [expMonth, expYearShort] = paymentData.expiry.split("/");
     const expMonthNum = Number(expMonth);
-    const expYearNum = Number("20" + expYearShort); // Assuming input is MM/YY
+    const expYearNum = Number("20" + expYearShort);
 
     const body = {
       deliveryAddress,
@@ -48,7 +52,7 @@ export const PaymentModal = ({
           cvc: paymentData.cvv,
           exp_month: expMonthNum,
           exp_year: expYearNum,
-          number: paymentData.cardNumber.replace(/\s+/g, ""), // remove spaces
+          number: paymentData.cardNumber.replace(/\s+/g, ""),
         },
       },
       items: cart.map((item) => ({
@@ -61,16 +65,22 @@ export const PaymentModal = ({
 
     try {
       await dispatch(createOrder("680ca51fa95a4a19afc4bd0d", body));
-      console.log("Order Placed Successfully", body);
-      dispatch(fetchCart());
-      dispatch(fetchOrders());
-      router.push("/myOrders");
-    } catch (err) {
-      console.error(err);
-      alert("Failed to place order!");
-    } finally {
-      onOpenChange(false);
-      reset();
+      const ordersState = (await import("@/redux/store")).store.getState()
+        .orders;
+
+      if (ordersState.error) {
+        setApiError("Invalid card details");
+      } else {
+        showToast(
+          "Payment Successful",
+          "Your payment has been received successfully."
+        );
+        dispatch(fetchCart());
+        dispatch(fetchOrders());
+        router.push("/myOrders");
+      }
+    } catch (error) {
+      setApiError("Invalid card details");
     }
   };
 
@@ -173,6 +183,9 @@ export const PaymentModal = ({
                 />
                 {errors.expiry && (
                   <span className="text-red-500 text-xs mt-1">Required</span>
+                )}
+                {apiError && (
+                  <div className="text-red-500 text-xs mt-1 ">{apiError}</div>
                 )}
               </div>
 

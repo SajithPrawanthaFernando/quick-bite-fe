@@ -13,7 +13,6 @@ import {
   getOngoingOrdersStart,
   getOngoingOrdersSuccess,
   getOngoingOrdersFailure,
-  
 } from "../slices/deliverySlice";
 import { deliveryApi } from "@/lib/api";
 import {
@@ -21,7 +20,7 @@ import {
   ADD_ORDER_ENDPOINT,
   UPDATE_ORDER_STATUS_ENDPOINT,
   GET_DELIVERIES_DELIVERED,
-  GET_USER_ONGOING
+  GET_USER_ONGOING,
 } from "@/config/apiConfig";
 
 export const getOrders = (id: string) => async (dispatch: AppDispatch) => {
@@ -31,6 +30,7 @@ export const getOrders = (id: string) => async (dispatch: AppDispatch) => {
       withCredentials: true,
     });
     dispatch(getDeliveriesSuccess(res.data));
+    console.log(res);
   } catch (err: any) {
     dispatch(
       getDeliveriesFailure(
@@ -54,21 +54,22 @@ export const getUserOrders = (id: string) => async (dispatch: AppDispatch) => {
     );
   }
 };
-export const getDeliveredOrders = (id: string) => async (dispatch: AppDispatch) => {
-  dispatch(getDeliveriesDeliveredStart());
-  try {
-    const res = await deliveryApi.get(GET_DELIVERIES_DELIVERED(id), {
-      withCredentials: true,
-    });
-    dispatch(getDeliveriesDeliveredSuccess(res.data));
-  } catch (err: any) {
-    dispatch(
-      getDeliveriesDeliveredFailure(
-        err?.response?.data?.message || "Failed to fetch deliveries"
-      )
-    );
-  }
-};
+export const getDeliveredOrders =
+  (id: string) => async (dispatch: AppDispatch) => {
+    dispatch(getDeliveriesDeliveredStart());
+    try {
+      const res = await deliveryApi.get(GET_DELIVERIES_DELIVERED(id), {
+        withCredentials: true,
+      });
+      dispatch(getDeliveriesDeliveredSuccess(res.data));
+    } catch (err: any) {
+      dispatch(
+        getDeliveriesDeliveredFailure(
+          err?.response?.data?.message || "Failed to fetch deliveries"
+        )
+      );
+    }
+  };
 
 export const addDeliveryOrder =
   (orderData: any) => async (dispatch: AppDispatch) => {
@@ -100,7 +101,6 @@ export const changeOrderStatus =
         { status: newStatus },
         { withCredentials: true }
       );
-
     } catch (err) {
       const error = err as AxiosError;
       const message = error.response?.data?.message || "Status update failed";

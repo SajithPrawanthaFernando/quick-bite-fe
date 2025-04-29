@@ -19,7 +19,30 @@ export default function OverviewPage() {
     dispatch(getAllUsers());
   }, [dispatch]);
 
-  console.log("Users", users);
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
+    if (storedUser && token) {
+      const parsedUser = JSON.parse(storedUser);
+
+      if (parsedUser.roles?.includes("admin")) {
+        dispatch(
+          loginSuccess({
+            token,
+            user: parsedUser,
+          })
+        );
+        setIsAuthorized(true);
+      } else {
+        setIsAuthorized(false);
+      }
+    } else {
+      setIsAuthorized(false);
+    }
+
+    setCheckingAuth(false);
+  }, [dispatch]);
 
   const cards = [
     {
@@ -66,34 +89,9 @@ export default function OverviewPage() {
     },
   ];
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
-
-    if (storedUser && token) {
-      const parsedUser = JSON.parse(storedUser);
-
-      if (parsedUser.roles?.includes("admin")) {
-        dispatch(
-          loginSuccess({
-            token,
-            user: parsedUser,
-          })
-        );
-        setIsAuthorized(true);
-      } else {
-        setIsAuthorized(false);
-      }
-    } else {
-      setIsAuthorized(false);
-    }
-
-    setCheckingAuth(false);
-  }, [dispatch]);
-
   if (checkingAuth) {
     return (
-      <div className=" flex justify-center items-center mt-[100px]">
+      <div className="flex justify-center items-center mt-[100px]">
         <Image
           src="/images/ripples.svg"
           alt="loading"
@@ -116,7 +114,6 @@ export default function OverviewPage() {
         orders today.
       </p>
 
-      {/* Owner Requests Alert */}
       <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-2 rounded mb-6">
         You have <span className="font-semibold">12 owner requests</span>{" "}
         pending approval.{" "}
@@ -125,7 +122,7 @@ export default function OverviewPage() {
         </span>
       </div>
 
-      {/* Cards Grid */}
+      {/* Metrics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         {cards.map((card, index) => (
           <div
@@ -144,7 +141,7 @@ export default function OverviewPage() {
         ))}
       </div>
 
-      {/* Section Placeholder */}
+      {/* Grid with Top Customers and Dummy Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Top Customers */}
         <div className="bg-white p-4 shadow rounded-lg">
@@ -199,23 +196,33 @@ export default function OverviewPage() {
           </ul>
         </div>
 
-        {/* Pie Chart Placeholder */}
+        {/* Pie Chart Dummy */}
         <div className="bg-white p-4 shadow rounded-lg flex flex-col items-center justify-center">
-          <h2 className="font-semibold text-lg mb-2">Top Categories</h2>
-          <div className="w-[140px] h-[140px] bg-gray-100 rounded-full flex items-center justify-center text-gray-400">
-            Pie Chart
+          <h2 className="font-semibold text-lg mb-4 text-black">
+            Top Categories
+          </h2>
+          <div className="w-[160px] h-[160px] rounded-full border-[12px] border-orange-300 relative">
+            <div className="absolute top-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 text-sm text-gray-600 font-medium">
+              Pie Chart
+            </div>
           </div>
         </div>
 
-        {/* Order Heatmap Placeholder */}
+        {/* Statistics Chart Dummy */}
         <div className="bg-white p-4 shadow rounded-lg">
-          <h2 className="font-semibold text-lg mb-4">Order Statistics</h2>
+          <h2 className="font-semibold text-lg mb-4 text-black">
+            Order Statistics
+          </h2>
           <div className="grid grid-cols-7 gap-1">
             {[...Array(49)].map((_, i) => (
               <div
                 key={i}
                 className={`h-6 w-6 rounded ${
-                  i % 7 === 0 ? "bg-orange-400" : "bg-orange-100"
+                  i % 7 === 0
+                    ? "bg-[#FDB940]"
+                    : i % 4 === 0
+                    ? "bg-yellow-200"
+                    : "bg-gray-100"
                 }`}
               />
             ))}
