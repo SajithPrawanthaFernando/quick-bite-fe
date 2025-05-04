@@ -41,17 +41,19 @@ const UsersPage = () => {
     role: string;
   } | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("driver");
-  const [ordersLoading, setOrdersLoading] = useState<Record<string, boolean>>({});
+  const [ordersLoading, setOrdersLoading] = useState<Record<string, boolean>>(
+    {}
+  );
 
   // Fetch orders for each user when users or roleFilter changes
   useEffect(() => {
     const fetchOrdersForUsers = async () => {
-      const usersToUpdate = users.filter(user => 
-        roleFilter === "all" || user.roles?.includes(roleFilter)
+      const usersToUpdate = users.filter(
+        (user) => roleFilter === "all" || user.roles?.includes(roleFilter)
       );
 
       const loadingStates: Record<string, boolean> = {};
-      usersToUpdate.forEach(user => {
+      usersToUpdate.forEach((user) => {
         loadingStates[user._id] = true;
       });
       setOrdersLoading(loadingStates);
@@ -64,14 +66,17 @@ const UsersPage = () => {
               return {
                 ...user,
                 deliveredOrders: result.payload?.deliveredCount || 0,
-                ongoingOrders: result.payload?.ongoingCount || 0
+                ongoingOrders: result.payload?.ongoingCount || 0,
               };
             } catch (error) {
-              console.error(`Failed to fetch orders for user ${user._id}:`, error);
+              console.error(
+                `Failed to fetch orders for user ${user._id}:`,
+                error
+              );
               return {
                 ...user,
                 deliveredOrders: 0,
-                ongoingOrders: 0
+                ongoingOrders: 0,
               };
             }
           }
@@ -180,23 +185,6 @@ const UsersPage = () => {
         Manage your platform drivers from here.
       </p>
 
-      {/* Role Filter */}
-      <div className="mb-4">
-        <label htmlFor="roleFilter" className="mr-2 text-sm font-medium text-gray-700">
-          Filter by Role:
-        </label>
-        <select
-          id="roleFilter"
-          value={roleFilter}
-          onChange={(e) => setRoleFilter(e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-1 text-sm"
-        >
-          <option value="driver">Driver</option>
-          <option value="admin">Admin</option>
-          <option value="all">All Roles</option>
-        </select>
-      </div>
-
       {loading && (
         <div className="flex justify-center items-center mt-[100px]">
           <Image
@@ -210,7 +198,8 @@ const UsersPage = () => {
       {error && <p className="text-red-500 font-medium">Error: {error}</p>}
       {!loading && filteredUsers.length === 0 && (
         <div className="bg-yellow-50 text-yellow-800 px-4 py-2 rounded mb-4 border border-yellow-200">
-          No users found {roleFilter !== "all" ? `with role ${roleFilter}` : "in the system"}.
+          No users found{" "}
+          {roleFilter !== "all" ? `with role ${roleFilter}` : "in the system"}.
         </div>
       )}
 
@@ -281,7 +270,8 @@ const UsersPage = () => {
           <div className="flex justify-between items-center px-4 py-3 border-t border-[#FDB940] bg-white text-sm">
             <div className="text-gray-600">
               Showing {indexOfFirstUser + 1}–
-              {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
+              {Math.min(indexOfLastUser, filteredUsers.length)} of{" "}
+              {filteredUsers.length} users
             </div>
             <div className="flex items-center gap-1">
               <button
