@@ -103,7 +103,7 @@ export const Header = () => {
       <div className={`flex items-center ${user ? "gap-7" : "gap-10"}`}>
         <div>
           <Link href="/myOrders">
-            <div className="text-black">My Orders</div>
+            <div className="text-black text-[15px]">My Orders</div>
           </Link>
         </div>
         <div className="relative">

@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { restaurantService } from '@/redux/services/restaurant.service';
-import { MenuItem } from '@/redux/services/restaurant.service';
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { restaurantService } from "@/redux/services/restaurant.service";
+import { MenuItem } from "@/redux/services/restaurant.service";
 
 export default function MenuManagement() {
   const router = useRouter();
@@ -11,18 +11,18 @@ export default function MenuManagement() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newItem, setNewItem] = useState({
-    name: '',
-    description: '',
-    price: '',
-    category: '',
-    image: '',
-    available: true
+    name: "",
+    description: "",
+    price: "",
+    category: "",
+    image: "",
+    available: true,
   });
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      router.push('/login');
+      router.push("/login");
       return;
     }
 
@@ -32,12 +32,12 @@ export default function MenuManagement() {
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
-      const restaurantId = 'YOUR_RESTAURANT_ID'; // You'll need to get this from your state management
+      const restaurantId = "680fa6f070987adca2e1bd41";
       const items = await restaurantService.getOwnerMenu(restaurantId);
       setMenuItems(items);
     } catch (error) {
-      setError('Failed to load menu items');
-      console.error('Error fetching menu:', error);
+      setError("Failed to load menu items");
+      console.error("Error fetching menu:", error);
     } finally {
       setLoading(false);
     }
@@ -50,39 +50,45 @@ export default function MenuManagement() {
         ...newItem,
         price: parseFloat(newItem.price),
       };
-      
+
       // Add the menu item through your API
       await restaurantService.createMenuItem(menuItem);
       setNewItem({
-        name: '',
-        description: '',
-        price: '',
-        category: '',
-        image: '',
-        available: true
+        name: "",
+        description: "",
+        price: "",
+        category: "",
+        image: "",
+        available: true,
       });
       fetchMenuItems();
     } catch (error) {
-      setError('Failed to add menu item');
-      console.error('Error adding menu item:', error);
+      setError("Failed to add menu item");
+      console.error("Error adding menu item:", error);
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setNewItem(prev => ({
+    setNewItem((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const toggleAvailability = async (id: string, currentStatus: boolean) => {
     try {
-      await restaurantService.updateMenuItem(id, { isAvailable: !currentStatus });
+      await restaurantService.updateMenuItem(id, {
+        isAvailable: !currentStatus,
+      });
       fetchMenuItems();
     } catch (error) {
-      setError('Failed to update menu item');
-      console.error('Error updating menu item:', error);
+      setError("Failed to update menu item");
+      console.error("Error updating menu item:", error);
     }
   };
 
@@ -100,7 +106,7 @@ export default function MenuManagement() {
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Menu Management</h1>
           <button
-            onClick={() => router.push('/restaurants/dashboard')}
+            onClick={() => router.push("/restaurants/dashboard")}
             className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300"
           >
             Back to Dashboard
@@ -120,7 +126,10 @@ export default function MenuManagement() {
               <h2 className="text-xl font-semibold mb-4">Add New Menu Item</h2>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="name"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Item Name
                   </label>
                   <input
@@ -135,7 +144,10 @@ export default function MenuManagement() {
                 </div>
 
                 <div>
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="description"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Description
                   </label>
                   <textarea
@@ -149,7 +161,10 @@ export default function MenuManagement() {
                 </div>
 
                 <div>
-                  <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="price"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Price
                   </label>
                   <input
@@ -166,7 +181,10 @@ export default function MenuManagement() {
                 </div>
 
                 <div>
-                  <label htmlFor="category" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="category"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Category
                   </label>
                   <select
@@ -186,7 +204,10 @@ export default function MenuManagement() {
                 </div>
 
                 <div>
-                  <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="image"
+                    className="block text-sm font-medium text-gray-700"
+                  >
                     Image URL
                   </label>
                   <input
@@ -215,7 +236,10 @@ export default function MenuManagement() {
               <h2 className="text-xl font-semibold mb-4">Menu Items</h2>
               <div className="space-y-4">
                 {menuItems.map((item) => (
-                  <div key={item.id} className="border rounded-lg p-4 flex justify-between items-center">
+                  <div
+                    key={item.id}
+                    className="border rounded-lg p-4 flex justify-between items-center"
+                  >
                     <div className="flex items-center space-x-4">
                       {item.image && (
                         <img
@@ -226,24 +250,34 @@ export default function MenuManagement() {
                       )}
                       <div>
                         <h3 className="font-medium">{item.name}</h3>
-                        <p className="text-sm text-gray-500">{item.description}</p>
-                        <p className="text-sm font-medium">${item.price.toFixed(2)}</p>
-                        <span className="text-xs text-gray-500">{item.category}</span>
+                        <p className="text-sm text-gray-500">
+                          {item.description}
+                        </p>
+                        <p className="text-sm font-medium">
+                          ${item.price.toFixed(2)}
+                        </p>
+                        <span className="text-xs text-gray-500">
+                          {item.category}
+                        </span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       <button
-                        onClick={() => toggleAvailability(item.id, item.isAvailable)}
+                        onClick={() =>
+                          toggleAvailability(item.id, item.isAvailable)
+                        }
                         className={`px-3 py-1 rounded text-sm ${
                           item.isAvailable
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-800'
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
                         }`}
                       >
-                        {item.isAvailable? 'Available' : 'Unavailable'}
+                        {item.isAvailable ? "Available" : "Unavailable"}
                       </button>
                       <button
-                        onClick={() => {/* Add edit functionality */}}
+                        onClick={() => {
+                          /* Add edit functionality */
+                        }}
                         className="px-3 py-1 bg-gray-100 text-gray-800 rounded text-sm"
                       >
                         Edit
@@ -258,4 +292,4 @@ export default function MenuManagement() {
       </div>
     </div>
   );
-} 
+}

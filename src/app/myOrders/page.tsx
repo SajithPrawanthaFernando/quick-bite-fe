@@ -170,7 +170,7 @@ export default function OrdersPage() {
               <h4 className="text-lg font-bold text-gray-900">Restaurant</h4>
             </div>
             <p className="text-gray-700 mb-2">
-              {order.restaurant?.name || "Not specified"}
+              {order.restaurant?.name || "Pizza Hut"}
             </p>
             <p className="text-sm text-gray-500">
               {order.restaurant?.address || "Address not available"}
