@@ -109,7 +109,7 @@ export const MenuDrawer = ({
             {/* Links */}
             <div className="mt-8 flex flex-col gap-5 text-sm font-medium text-black">
               <Dialog.Close asChild>
-                <Link href="#">Create a business account</Link>
+                <Link href="/restaurants/register">Create a business account</Link>
               </Dialog.Close>
               <Dialog.Close asChild>
                 <Link href="/RestaurantOwnerRegisterPage">

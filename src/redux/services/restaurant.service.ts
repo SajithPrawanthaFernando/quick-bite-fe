@@ -137,6 +137,8 @@ export const restaurantService = {
 
   getRestaurant: (id: string) => 
     apiService.get<Restaurant>(`/restaurants/${id}`),
+  getRestaurantByOwner: (id: string) => 
+    apiService.get<Restaurant>(`/restaurants/owner/${id}`),
   
   getRestaurantOrders: (id: string) => 
     apiService.get<Order[]>(`/restaurants/${id}/orders`),
