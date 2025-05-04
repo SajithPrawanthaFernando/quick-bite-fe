@@ -1,0 +1,344 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { AppDispatch } from "@/hooks/reduxHooks";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllUsers, deleteUser } from "@/redux/actions/usersActions";
+import { RootState } from "@/redux/store";
+import { Trash2, RefreshCw } from "lucide-react";
+import { ChangeRoleModal } from "@/components/modals/ChangeRoleModal";
+import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal";
+import { useToast } from "@/components/ToastProvider";
+import { notFound } from "next/navigation";
+import { loginSuccess } from "@/redux/slices/authSlice";
+import Image from "next/image";
+import { getDeliveredOrders } from "@/redux/actions/deliveryActions";
+
+interface UserWithOrders {
+  _id: string;
+  fullname?: string;
+  firstname?: string;
+  lastname?: string;
+  phone: string;
+  roles?: string[];
+  deliveredOrders?: number;
+  ongoingOrders?: number;
+}
+
+const UsersPage = () => {
+  const dispatch = AppDispatch();
+  const { users, loading, error } = useSelector(
+    (state: RootState) => state.user
+  );
+  const deliveryState = useSelector((state: RootState) => state.delivery);
+
+  const [usersWithOrders, setUsersWithOrders] = useState<UserWithOrders[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const [selectedUser, setSelectedUser] = useState<{
+    id: string;
+    role: string;
+  } | null>(null);
+  const [roleFilter, setRoleFilter] = useState<string>("driver");
+  const [ordersLoading, setOrdersLoading] = useState<Record<string, boolean>>({});
+
+  // Fetch orders for each user when users or roleFilter changes
+  useEffect(() => {
+    const fetchOrdersForUsers = async () => {
+      const usersToUpdate = users.filter(user => 
+        roleFilter === "all" || user.roles?.includes(roleFilter)
+      );
+
+      const loadingStates: Record<string, boolean> = {};
+      usersToUpdate.forEach(user => {
+        loadingStates[user._id] = true;
+      });
+      setOrdersLoading(loadingStates);
+
+      const updatedUsers = await Promise.all(
+        users.map(async (user) => {
+          if (roleFilter === "all" || user.roles?.includes(roleFilter)) {
+            try {
+              const result = await dispatch(getDeliveredOrders(user._id));
+              return {
+                ...user,
+                deliveredOrders: result.payload?.deliveredCount || 0,
+                ongoingOrders: result.payload?.ongoingCount || 0
+              };
+            } catch (error) {
+              console.error(`Failed to fetch orders for user ${user._id}:`, error);
+              return {
+                ...user,
+                deliveredOrders: 0,
+                ongoingOrders: 0
+              };
+            }
+          }
+          return user;
+        })
+      );
+
+      setUsersWithOrders(updatedUsers);
+      setOrdersLoading({});
+    };
+
+    if (users.length > 0) {
+      fetchOrdersForUsers();
+    }
+  }, [users, roleFilter, dispatch]);
+
+  // Filter users based on role
+  const filteredUsers = usersWithOrders.filter((user) => {
+    if (roleFilter === "all") return true;
+    return user.roles?.includes(roleFilter);
+  });
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 6;
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
+  const { showToast } = useToast();
+
+  const goToPage = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    dispatch(getAllUsers());
+  }, [dispatch]);
+
+  // Reset to first page when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [roleFilter]);
+
+  const handleDelete = (userId: string) => {
+    setDeletingUserId(userId);
+    setDeleteModalOpen(true);
+  };
+
+  const handleChangeRole = (userId: string, currentRole: string) => {
+    setSelectedUser({ id: userId, role: currentRole });
+    setModalOpen(true);
+  };
+
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+
+    if (storedUser && token) {
+      const parsedUser = JSON.parse(storedUser);
+
+      if (parsedUser.roles?.includes("admin")) {
+        dispatch(
+          loginSuccess({
+            token,
+            user: parsedUser,
+          })
+        );
+        setIsAuthorized(true);
+      } else {
+        setIsAuthorized(false);
+      }
+    } else {
+      setIsAuthorized(false);
+    }
+
+    setCheckingAuth(false);
+  }, [dispatch]);
+
+  if (checkingAuth) {
+    return (
+      <div className="flex justify-center items-center mt-[100px]">
+        <Image
+          src="/images/ripples.svg"
+          alt="loading"
+          width={160}
+          height={160}
+        />
+      </div>
+    );
+  }
+
+  if (!isAuthorized) {
+    return notFound();
+  }
+
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-2 text-black">Driver Management</h1>
+      <p className="text-gray-600 mb-6">
+        Manage your platform drivers from here.
+      </p>
+
+      {/* Role Filter */}
+      <div className="mb-4">
+        <label htmlFor="roleFilter" className="mr-2 text-sm font-medium text-gray-700">
+          Filter by Role:
+        </label>
+        <select
+          id="roleFilter"
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-1 text-sm"
+        >
+          <option value="driver">Driver</option>
+          <option value="admin">Admin</option>
+          <option value="all">All Roles</option>
+        </select>
+      </div>
+
+      {loading && (
+        <div className="flex justify-center items-center mt-[100px]">
+          <Image
+            src="/images/ripples.svg"
+            alt="loading"
+            width={160}
+            height={160}
+          />
+        </div>
+      )}
+      {error && <p className="text-red-500 font-medium">Error: {error}</p>}
+      {!loading && filteredUsers.length === 0 && (
+        <div className="bg-yellow-50 text-yellow-800 px-4 py-2 rounded mb-4 border border-yellow-200">
+          No users found {roleFilter !== "all" ? `with role ${roleFilter}` : "in the system"}.
+        </div>
+      )}
+
+      {!loading && filteredUsers.length > 0 && (
+        <div className="overflow-x-auto rounded-lg border border-[#FDB940] bg-white">
+          <table className="min-w-full text-sm">
+            <thead className="bg-[#FDB940] text-gray-700 font-semibold">
+              <tr>
+                <th className="px-4 py-3 text-left">Full Name</th>
+                <th className="px-4 py-3 text-left">Phone</th>
+                <th className="px-4 py-3 text-left">Ongoing Deliveries</th>
+                <th className="px-4 py-3 text-left">Delivered</th>
+                <th className="px-4 py-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-800">
+              {currentUsers.map((user, index) => (
+                <tr
+                  key={user._id}
+                  className={`hover:bg-gray-50 ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  }`}
+                >
+                  <td className="px-4 py-3">
+                    {user.fullname || `${user.firstname} ${user.lastname}`}
+                  </td>
+                  <td className="px-4 py-3">{user.phone}</td>
+                  <td className="px-4 py-3">
+                    {ordersLoading[user._id] ? (
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-blue-500 border-r-transparent"></span>
+                    ) : (
+                      user.ongoingOrders || 0
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {ordersLoading[user._id] ? (
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-blue-500 border-r-transparent"></span>
+                    ) : (
+                      user.deliveredOrders || 0
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <div className="flex justify-center items-center gap-3">
+                      <button
+                        onClick={() =>
+                          handleChangeRole(user._id, user.roles?.[0] || "user")
+                        }
+                        title="Change Role"
+                        className="p-2 rounded-md bg-blue-50 text-blue-600 hover:bg-blue-100 transition"
+                      >
+                        <RefreshCw className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(user._id)}
+                        title="Delete User"
+                        className="p-2 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* Pagination Footer */}
+          <div className="flex justify-between items-center px-4 py-3 border-t border-[#FDB940] bg-white text-sm">
+            <div className="text-gray-600">
+              Showing {indexOfFirstUser + 1}–
+              {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
+            </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => goToPage(currentPage - 1)}
+                className="px-3 py-1 border border-gray-200 text-gray-400 rounded hover:bg-gray-100 disabled:opacity-40"
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              {[...Array(totalPages)].map((_, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => goToPage(idx + 1)}
+                  className={`px-3 py-1 border text-gray-400 rounded hover:text-white hover:bg-[#FDB940] ${
+                    currentPage === idx + 1
+                      ? "bg-[#FDB940] text-white border-[#FDB940] font-semibold"
+                      : "border-gray-200"
+                  }`}
+                >
+                  {idx + 1}
+                </button>
+              ))}
+              <button
+                onClick={() => goToPage(currentPage + 1)}
+                className="px-3 py-1 border rounded hover:bg-gray-100 text-gray-400 border-gray-200 disabled:opacity-40"
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modals */}
+      {selectedUser && (
+        <ChangeRoleModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          userId={selectedUser.id}
+          currentRole={selectedUser.role}
+        />
+      )}
+
+      {deletingUserId && (
+        <DeleteConfirmModal
+          open={deleteModalOpen}
+          onOpenChange={setDeleteModalOpen}
+          onConfirm={async () => {
+            await dispatch(deleteUser(deletingUserId));
+            showToast("User Deleted", "The user was successfully removed.");
+            setDeletingUserId(null);
+          }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default UsersPage;

@@ -32,7 +32,6 @@ export default function MenuManagement() {
   const fetchMenuItems = async () => {
     try {
       setLoading(true);
-      // Get restaurant ID from URL or state management
       const restaurantId = 'YOUR_RESTAURANT_ID'; // You'll need to get this from your state management
       const items = await restaurantService.getOwnerMenu(restaurantId);
       setMenuItems(items);

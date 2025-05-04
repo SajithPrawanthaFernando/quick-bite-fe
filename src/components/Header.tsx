@@ -101,6 +101,11 @@ export const Header = () => {
 
       {/* Right Section */}
       <div className={`flex items-center ${user ? "gap-7" : "gap-10"}`}>
+        <div>
+          <Link href="/myOrders">
+            <div className="text-black">My Orders</div>
+          </Link>
+        </div>
         <div className="relative">
           <Link href="/cart">
             <ShoppingCart className="text-black w-5 h-5" />

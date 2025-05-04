@@ -8,7 +8,7 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 export default function RestaurantOwnerDashboard() {
   const params = useParams();
-  const restaurantId = params.id as string;
+  const ownerId = params.id as string;
 
   const [restaurant, setRestaurant] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
@@ -39,16 +39,18 @@ export default function RestaurantOwnerDashboard() {
 
   useEffect(() => {
     fetchRestaurantData();
-  }, [restaurantId, selectedPeriod]);
+  }, [ownerId, selectedPeriod]);
 
   const fetchRestaurantData = async () => {
     try {
       setLoading(true);
       const [restaurantData, menuData] = await Promise.all([
-        restaurantService.getRestaurant(restaurantId),
-        restaurantService.getOwnerMenu(restaurantId),
+        restaurantService.getRestaurantByOwner(ownerId),
+        restaurantService.getOwnerMenu(ownerId),
         
       ]);
+      console.log("res", restaurantData);
+      
       setRestaurant(restaurantData);
       setMenuItems(menuData);
      
@@ -83,8 +85,11 @@ export default function RestaurantOwnerDashboard() {
       const newItem = {
         ...menuForm,
         price: parseFloat(menuForm.price),
-        restaurant: restaurantId
+        restaurant: restaurant._id
       };
+
+      console.log(newItem);
+      
       await restaurantService.createMenuItem(newItem);
       alert('Menu item added successfully!');
       setShowAddMenuModal(false);
@@ -124,7 +129,7 @@ export default function RestaurantOwnerDashboard() {
 
   const handleUpdateAvailability = async (isTemporarilyClosed: boolean, endDate?: string) => {
     try {
-      await availabilityService.updateRestaurantAvailability(restaurantId, {
+      await availabilityService.updateRestaurantAvailability(restaurant._id, {
         isTemporarilyClosed,
         temporaryClosureEndDate: endDate
       });
@@ -139,7 +144,7 @@ export default function RestaurantOwnerDashboard() {
 
   const handleRemoveSpecialDay = async (date: string) => {
     try {
-      await availabilityService.removeSpecialDay(restaurantId, date);
+      await availabilityService.removeSpecialDay(restaurant._id, date);
       fetchRestaurantData();
     } catch (err) {
       console.error('Failed to remove special day', err);

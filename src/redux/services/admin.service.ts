@@ -30,7 +30,7 @@ export const adminService = {
 
   getPendingRestaurants: async () => {
     try {
-      const result = await apiService.get<{ data: Restaurant[]; meta: any }>('/admin/restaurants?status=pending');
+      const result = await apiService.get<{ data: Restaurant[]; meta: any }>('/restaurants?status=pending');
       console.log('Fetched result:', result);
 
       // Check if we have data in the response
@@ -71,7 +71,7 @@ export const adminService = {
   // Get approved restaurants
   getApprovedRestaurants: async () => {
     try {
-      const result = await apiService.get<{ data: Restaurant[]; meta: any }>('/admin/restaurants?status=approved');
+      const result = await apiService.get<{ data: Restaurant[]; meta: any }>('/restaurants?status=approved');
       return result.data || [];
     } catch (error) {
       console.error('Error fetching approved restaurants:', error);
@@ -82,7 +82,7 @@ export const adminService = {
   // Get rejected restaurants
   getRejectedRestaurants: async () => {
     try {
-      const result = await apiService.get<{ data: Restaurant[]; meta: any }>('/admin/restaurants?status=rejected');
+      const result = await apiService.get<{ data: Restaurant[]; meta: any }>('/restaurants?status=rejected');
       return result.data || [];
     } catch (error) {
       console.error('Error fetching rejected restaurants:', error);

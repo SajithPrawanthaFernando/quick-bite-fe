@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { restaurantService } from '@/redux/services/restaurant.service';
+import { LoginModal } from "../../../components/modals/LoginModal";
+
 
 interface RestaurantFormData {
   name: string;
@@ -70,7 +72,7 @@ export default function RestaurantRegistration() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+        <h2 className="text-3xl font-bold text-center text-gray-900 mb-8 mt-20">
           Register Your Restaurant
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">

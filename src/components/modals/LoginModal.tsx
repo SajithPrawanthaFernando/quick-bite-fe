@@ -62,10 +62,15 @@ export const LoginModal = ({
       showToast("Success", "Login successful!");
       onOpenChange(false);
 
+      console.log(loggedInUser);
+      
+
       if (loggedInUser?.roles?.includes("admin")) {
         router.push("/admin");
       } else if (loggedInUser?.roles?.includes("driver")) {
         router.push("/driver");
+      } else if (loggedInUser?.roles?.includes("owner")) {
+        router.push(`/restaurants/owner/${loggedInUser.id}/dashboard`);
       } else {
         router.push("/");
       }
