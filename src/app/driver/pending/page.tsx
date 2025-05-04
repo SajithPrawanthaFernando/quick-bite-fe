@@ -5,7 +5,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { notFound } from "next/navigation";
 import { FaTruckPickup } from "react-icons/fa";
-import { getDeliveryOrders, changeOrderStatus } from "@/redux/actions/orderAction";
+import {
+  getDeliveryOrders,
+  changeOrderStatus,
+} from "@/redux/actions/orderAction";
 import { addDeliveryOrder } from "@/redux/actions/deliveryActions";
 import { getAllUsers } from "@/redux/actions/usersActions";
 import { fetchRestaurants } from "@/redux/actions/restaurantAction";
@@ -30,8 +33,6 @@ export default function PendingPage() {
       }
     }
   }, []);
-
-  
 
   useEffect(() => {
     dispatch(getDeliveryOrders());
@@ -89,7 +90,6 @@ export default function PendingPage() {
       };
 
       console.log(order);
-      
 
       await dispatch(addDeliveryOrder(deliveryOrderData));
       setSelectedOrder(order._id);
@@ -100,7 +100,7 @@ export default function PendingPage() {
         `Order #${order.orderId} is now assigned to you`,
         "success"
       );
-      dispatch(changeOrderStatus(order._id,"confirmed"));
+      dispatch(changeOrderStatus(order._id, "confirmed"));
       dispatch(getDeliveryOrders());
     } catch (error) {
       showToast(
@@ -114,8 +114,6 @@ export default function PendingPage() {
       dispatch(getDeliveryOrders());
     }
   };
-
-  
 
   return (
     <div className="p-4">

@@ -91,7 +91,7 @@ export const updateOrderStatus =
   (orderId: string, status: string) => async (dispatch: AppDispatch) => {
     dispatch(updateOrderStatusStart());
     try {
-      const res = await orderApi.put(`/order/${orderId}/status`, { status });
+      const res = await orderApi.put(`/orders/${orderId}/status`, { status });
       dispatch(updateOrderStatusSuccess(res.data));
     } catch (err: any) {
       dispatch(
