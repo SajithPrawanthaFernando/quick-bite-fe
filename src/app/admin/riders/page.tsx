@@ -12,13 +12,27 @@ import { useToast } from "@/components/ToastProvider";
 import { notFound } from "next/navigation";
 import { loginSuccess } from "@/redux/slices/authSlice";
 import Image from "next/image";
+import { getDeliveredOrders } from "@/redux/actions/deliveryActions";
+
+interface UserWithOrders {
+  _id: string;
+  fullname?: string;
+  firstname?: string;
+  lastname?: string;
+  phone: string;
+  roles?: string[];
+  deliveredOrders?: number;
+  ongoingOrders?: number;
+}
 
 const UsersPage = () => {
   const dispatch = AppDispatch();
   const { users, loading, error } = useSelector(
     (state: RootState) => state.user
   );
+  const deliveryState = useSelector((state: RootState) => state.delivery);
 
+  const [usersWithOrders, setUsersWithOrders] = useState<UserWithOrders[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
@@ -26,15 +40,61 @@ const UsersPage = () => {
     id: string;
     role: string;
   } | null>(null);
-  const [roleFilter, setRoleFilter] = useState<string>("driver"); // New state for role filter
+  const [roleFilter, setRoleFilter] = useState<string>("driver");
+  const [ordersLoading, setOrdersLoading] = useState<Record<string, boolean>>({});
+
+  // Fetch orders for each user when users or roleFilter changes
+  useEffect(() => {
+    const fetchOrdersForUsers = async () => {
+      const usersToUpdate = users.filter(user => 
+        roleFilter === "all" || user.roles?.includes(roleFilter)
+      );
+
+      const loadingStates: Record<string, boolean> = {};
+      usersToUpdate.forEach(user => {
+        loadingStates[user._id] = true;
+      });
+      setOrdersLoading(loadingStates);
+
+      const updatedUsers = await Promise.all(
+        users.map(async (user) => {
+          if (roleFilter === "all" || user.roles?.includes(roleFilter)) {
+            try {
+              const result = await dispatch(getDeliveredOrders(user._id));
+              return {
+                ...user,
+                deliveredOrders: result.payload?.deliveredCount || 0,
+                ongoingOrders: result.payload?.ongoingCount || 0
+              };
+            } catch (error) {
+              console.error(`Failed to fetch orders for user ${user._id}:`, error);
+              return {
+                ...user,
+                deliveredOrders: 0,
+                ongoingOrders: 0
+              };
+            }
+          }
+          return user;
+        })
+      );
+
+      setUsersWithOrders(updatedUsers);
+      setOrdersLoading({});
+    };
+
+    if (users.length > 0) {
+      fetchOrdersForUsers();
+    }
+  }, [users, roleFilter, dispatch]);
 
   // Filter users based on role
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = usersWithOrders.filter((user) => {
     if (roleFilter === "all") return true;
     return user.roles?.includes(roleFilter);
   });
 
-  // Pagination states - now using filteredUsers instead of users
+  // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 6;
   const indexOfLastUser = currentPage * usersPerPage;
@@ -98,7 +158,7 @@ const UsersPage = () => {
 
   if (checkingAuth) {
     return (
-      <div className=" flex justify-center items-center mt-[100px]">
+      <div className="flex justify-center items-center mt-[100px]">
         <Image
           src="/images/ripples.svg"
           alt="loading"
@@ -120,8 +180,25 @@ const UsersPage = () => {
         Manage your platform drivers from here.
       </p>
 
+      {/* Role Filter */}
+      <div className="mb-4">
+        <label htmlFor="roleFilter" className="mr-2 text-sm font-medium text-gray-700">
+          Filter by Role:
+        </label>
+        <select
+          id="roleFilter"
+          value={roleFilter}
+          onChange={(e) => setRoleFilter(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-1 text-sm"
+        >
+          <option value="driver">Driver</option>
+          <option value="admin">Admin</option>
+          <option value="all">All Roles</option>
+        </select>
+      </div>
+
       {loading && (
-        <div className=" flex justify-center items-center mt-[100px]">
+        <div className="flex justify-center items-center mt-[100px]">
           <Image
             src="/images/ripples.svg"
             alt="loading"
@@ -138,12 +215,14 @@ const UsersPage = () => {
       )}
 
       {!loading && filteredUsers.length > 0 && (
-        <div className="overflow-x-auto rounded-lg  border border-[#FDB940] bg-white ">
-          <table className="min-w-full text-sm  ">
-            <thead className="bg-[#FDB940] text-gray-700 font-semibold ">
+        <div className="overflow-x-auto rounded-lg border border-[#FDB940] bg-white">
+          <table className="min-w-full text-sm">
+            <thead className="bg-[#FDB940] text-gray-700 font-semibold">
               <tr>
                 <th className="px-4 py-3 text-left">Full Name</th>
                 <th className="px-4 py-3 text-left">Phone</th>
+                <th className="px-4 py-3 text-left">Ongoing Deliveries</th>
+                <th className="px-4 py-3 text-left">Delivered</th>
                 <th className="px-4 py-3 text-center">Actions</th>
               </tr>
             </thead>
@@ -159,6 +238,20 @@ const UsersPage = () => {
                     {user.fullname || `${user.firstname} ${user.lastname}`}
                   </td>
                   <td className="px-4 py-3">{user.phone}</td>
+                  <td className="px-4 py-3">
+                    {ordersLoading[user._id] ? (
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-blue-500 border-r-transparent"></span>
+                    ) : (
+                      user.ongoingOrders || 0
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {ordersLoading[user._id] ? (
+                      <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-solid border-blue-500 border-r-transparent"></span>
+                    ) : (
+                      user.deliveredOrders || 0
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-center">
                     <div className="flex justify-center items-center gap-3">
                       <button
@@ -185,7 +278,7 @@ const UsersPage = () => {
           </table>
 
           {/* Pagination Footer */}
-          <div className="flex justify-between items-center px-4 py-3 border-t border-[#FDB940]  bg-white text-sm">
+          <div className="flex justify-between items-center px-4 py-3 border-t border-[#FDB940] bg-white text-sm">
             <div className="text-gray-600">
               Showing {indexOfFirstUser + 1}–
               {Math.min(indexOfLastUser, filteredUsers.length)} of {filteredUsers.length} users
@@ -202,9 +295,9 @@ const UsersPage = () => {
                 <button
                   key={idx}
                   onClick={() => goToPage(idx + 1)}
-                  className={`px-3 py-1 border  text-gray-400 rounded hover:text-white hover:bg-[#FDB940] ${
+                  className={`px-3 py-1 border text-gray-400 rounded hover:text-white hover:bg-[#FDB940] ${
                     currentPage === idx + 1
-                      ? "bg-[#FDB940] text-white border-[#FDB940] font-semibold "
+                      ? "bg-[#FDB940] text-white border-[#FDB940] font-semibold"
                       : "border-gray-200"
                   }`}
                 >
